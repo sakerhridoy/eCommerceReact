@@ -1,0 +1,94 @@
+@import "tailwindcss";
+.container {
+  @apply max-w-[1170px] mx-auto;
+}
+@theme  {
+  --font-poppins: 'Poppins', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+}
+.menu ul li a{
+  @apply font-poppins font-normal text-base text-black leading-6 cursor-pointer text-center duration-500 border-b border-black/0 hover:border-b hover:border-black;
+}
+.banner_menu a{
+  @apply font-poppins font-normal text-base text-black leading-6 cursor-pointer text-left;
+}
+@layer {
+  .slick-dots{
+    position: absolute;
+    content: "" !important;
+    left: 50% !important;
+    bottom: 12px !important;
+    -webkit-transform: translateX(-50%) !important;
+    -moz-transform: translateX(-50%) !important;
+    -ms-transform: translateX(-50%) !important;
+    -o-transform: translateX(-50%) !important;
+    transform: translateX(-50%) !important;
+}
+ .slick-dots li.slick-active {
+   position: relative !important;
+   width: 14px !important;
+   height: 14px !important;
+   border: 2px solid #fff !important;
+   border-radius: 50% !important;
+}
+ .slick-dots li button:before{
+    font-size: 12px !important;
+    color: rgba(255, 255, 255, 0.5) !important;
+    opacity: 1 !important;
+    line-height: 14px !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+ }
+ .slick-dots li.slick-active button:before {
+  position: absolute !important;
+  top: -1px!important;
+  left: -5px !important;
+  color: #DB4444 !important;
+  opacity: 1 !important;
+  line-height: 14px !important;
+  text-align: center !important;
+ }
+ .categoryBanner{
+background: linear-gradient(90deg,rgba(5, 5, 5, 1) 53%, rgba(60, 60, 64, 0.96) 72%, rgba(0, 0, 0, 1) 97%);
+ }
+ .speakers{
+  background: radial-gradient(circle,rgba(69, 67, 67, 1) 0%, rgba(37, 37, 38, 1) 52%);
+ }
+ .perfume{
+ background: radial-gradient(circle,rgba(69, 67, 67, 1) 11%, rgba(37, 37, 38, 1) 86%);
+ }
+
+/* @keyframes spin-slow {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(-360deg); 
+  }
+} 
+
+.animate-spin-slow {
+  animation: spin-slow 60s linear infinite; 
+}
+  */
+
+/* BASE DOT */
+.team-pagination .custom-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #bfbfbf;
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+/* ACTIVE DOT (RED CENTER) */
+.team-pagination .swiper-pagination-bullet-active {
+  border: 2px solid #bfbfbf !important;
+  border-color: #bfbfbf!important;
+  background: #db4444!important;
+  box-shadow: 0 0 0 2px rgba(244, 240, 240, 0.25);
+}
+
+
+}
