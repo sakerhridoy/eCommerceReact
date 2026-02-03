@@ -77,7 +77,9 @@ const Login = () => {
               {error ? (
                 <p className="text-red-500">{error}</p>
               ) : (
-                <p className="text-black font-poppins text-base leading-6">Enter your details below</p>
+                <p className="text-black font-poppins text-base leading-6">
+                  Enter your details below
+                </p>
               )}
             </div>
 
@@ -102,26 +104,26 @@ const Login = () => {
                 required
                 disabled={loading}
               />
+              <div className="flex pt-8 gap-24">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full bg-[#DB4444] py-4 text-white font-normal rounded-sm transition ${
+                    loading
+                      ? 'opacity-70 cursor-not-allowed'
+                      : 'hover:bg-[#c0392b]'
+                  }`}
+                >
+                  {loading ? 'Logging in...' : 'Log in'}
+                </button>
+                <button
+                  type="button"
+                  className={`w-full text-[#DB4444] py-4 font-normal font-poppins`}
+                >
+                  Forget Password?
+                </button>
+              </div>
             </form>
-            <div className="flex pt-8 gap-24">
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full bg-[#DB4444] py-4 text-white font-normal rounded-sm transition ${
-                  loading
-                    ? 'opacity-70 cursor-not-allowed'
-                    : 'hover:bg-[#c0392b]'
-                }`}
-              >
-                {loading ? 'Logging in...' : 'Log in'}
-              </button>
-              <button
-                type="button"
-                className={`w-full text-[#DB4444] py-4 font-normal font-poppins`}
-              >
-                Forget Password?
-              </button>
-            </div>
           </div>
         </div>
       </div>

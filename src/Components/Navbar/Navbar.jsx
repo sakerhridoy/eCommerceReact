@@ -1,41 +1,39 @@
 import { useState, useEffect, useRef } from 'react';
 import { MdOutlineKeyboardArrowDown } from 'react-icons/md';
-import { LuShoppingBag, LuStar } from 'react-icons/lu';
-import { AiOutlineCloseCircle } from 'react-icons/ai';
 import { FiSearch } from 'react-icons/fi';
 import { FaRegHeart } from 'react-icons/fa6';
 import { IoCartOutline } from 'react-icons/io5';
+import { LuUser, LuShoppingBag, LuStar } from 'react-icons/lu';
+import { AiOutlineCloseCircle } from 'react-icons/ai';
 import { TbLogout2 } from 'react-icons/tb';
-import { LuUser } from 'react-icons/lu';
+import { RxHamburgerMenu } from 'react-icons/rx';
 import logo from '../../assets/Images/logo.png';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useShop } from '../../Context/ShopContext/ShopContext';
+import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [showAcc, setShowAcc] = useState(false);
-
-  // Global cart & wishlist from ShopContext
   const { cart, wishlist } = useShop();
+  const { user, logout } = useAuth();
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showAcc, setShowAcc] = useState(false);
+  const [search, setSearch] = useState('');
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const dropdownRef = useRef(null);
+  const hideIcons =
+    location.pathname === '/login' || location.pathname === '/signup';
 
   const cartCount = cart.reduce(
     (total, item) => total + (item.quantity || 1),
     0,
   );
   const wishlistCount = wishlist.length;
-
-  /* ================= SEARCH ================= */
-  const [search, setSearch] = useState('');
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const hideIcons =
-    location.pathname === '/signup' || location.pathname === '/login';
-
-  // Ref for dropdown container (to detect outside click)
-  const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -48,107 +46,112 @@ const Navbar = () => {
         setShowAcc(false);
       }
     };
-
-    // Add event listener to whole document
     document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showAcc]);
 
-    // Cleanup on unmount
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showAcc]); // Re-run when showAcc changes
-
-  /* ================= LIVE SEARCH DROPDOWN ================= */
+  // Mobile menu scroll lock
   useEffect(() => {
-    if (!search.trim()) {
-      setResults([]);
-      return;
-    }
+    document.body.style.overflow = isMenuOpen ? 'hidden' : 'auto';
+  }, [isMenuOpen]);
 
-    const delay = setTimeout(async () => {
+  // Live search dropdown
+  useEffect(() => {
+    if (!search.trim()) return setResults([]);
+
+    const timer = setTimeout(async () => {
       try {
         setLoading(true);
         const res = await axios.get(
           `https://dummyjson.com/products/search?q=${search}`,
         );
         setResults(res.data.products.slice(0, 5));
-      } catch (err) {
+      } catch {
         setResults([]);
       } finally {
         setLoading(false);
       }
-    }, 500); // debounce
+    }, 400);
 
-    return () => clearTimeout(delay);
+    return () => clearTimeout(timer);
   }, [search]);
 
-  /* ================= HANDLE SEARCH SUBMIT ================= */
-  const handleSearch = e => {
+  const handleSearchSubmit = e => {
     e.preventDefault();
     if (!search.trim()) return;
-
     navigate(`/shop?search=${search}`);
     setSearch('');
     setResults([]);
+    setIsMenuOpen(false);
   };
 
+  const handleLogout = async () => {
+    await logout();
+    setShowAcc(false);
+    setIsMenuOpen(false);
+    navigate('/login');
+  };
+
+  const closeMenu = () => setIsMenuOpen(false);
+
   return (
-    <nav className="pb-4 border-b border-black/20">
-      {/* TOP BAR */}
-      <div className="bg-black py-3">
-        <div className="container flex justify-end-safe gap-[265px] items-center">
-          <div className="left">
-            <p className="font-poppins font-normal text-sm text-[#FAFAFA] leading-[21px]">
-              Summer Sale For All Swim Suits And Free Express Delivery - OFF
-              50%!
-              <Link
-                to="/shop"
-                className="underline leading-6 font-semibold ps-2"
-              >
-                ShopNow
-              </Link>
-            </p>
-          </div>
-          <div className="flex justify-end">
-            <select className="text-white bg-black outline-none">
-              <option>English</option>
-              <option>Bangla</option>
-            </select>
-          </div>
+    <nav className="border-b border-gray-200/70 bg-white sticky top-0 z-50">
+      {/* Top Bar */}
+      <div className="bg-black py-2.5 text-white text-center text-[10px] sm:text-sm">
+        <div className="container flex justify-center items-center">
+          Summer Sale For All Swim Suits And Free Express Delivery - OFF 50%!
+          <Link to="/shop" className="underline ps-2">
+            ShopNow
+          </Link>
         </div>
       </div>
 
-      {/* MAIN NAV */}
-      <div className="container relative">
-        <div className="flex justify-between items-center mt-10">
-          {/* LOGO */}
-          <Link to="/">
-            <img src={logo} alt="logo" className="w-[118px]" />
+      {/* Main Navbar */}
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between py-4 lg:py-5">
+          {/* Logo */}
+          <Link to="/" onClick={closeMenu}>
+            <img src={logo} alt="Logo" className="h-9 md:h-10 w-auto" />
           </Link>
 
-          {/* MENU */}
-          <ul className="flex gap-12">
+          {/* Desktop Menu */}
+          <ul className="hidden lg:flex items-center gap-9 text-[15px] font-medium text-gray-800">
             <li>
-              <Link to="/">Home</Link>
+              <Link to="/" onClick={closeMenu}>
+                Home
+              </Link>
             </li>
             <li>
-              <Link to="/shop">Shop</Link>
+              <Link to="/shop" onClick={closeMenu}>
+                Shop
+              </Link>
             </li>
             <li>
-              <Link to="/contact">Contact</Link>
+              <Link to="/contact" onClick={closeMenu}>
+                Contact
+              </Link>
             </li>
             <li>
-              <Link to="/about">About</Link>
+              <Link to="/about" onClick={closeMenu}>
+                About
+              </Link>
             </li>
-            <li>
-              <Link to="/signup">Sign Up</Link>
-            </li>
+            {!user && (
+              <li>
+                <Link to="/signup" onClick={closeMenu}>
+                  Sign Up
+                </Link>
+              </li>
+            )}
           </ul>
 
-          {/* RIGHT */}
-          <div className="flex items-center gap-6 relative">
-            {/* 🔍 SEARCH */}
-            <form onSubmit={handleSearch} className="relative w-[243px]">
+          {/* Right */}
+          <div className="flex items-center gap-4 lg:gap-6">
+            {/* Search */}
+            <form
+              onSubmit={handleSearchSubmit}
+              className="relative hidden sm:block min-w-[220px] md:min-w-[320px]"
+            >
               <div className="bg-[#F5F5F5] rounded-sm flex items-center py-2.5 px-4">
                 <input
                   type="text"
@@ -161,8 +164,6 @@ const Navbar = () => {
                   <FiSearch className="text-black" />
                 </button>
               </div>
-
-              {/* SEARCH DROPDOWN */}
               {search && (
                 <div className="absolute top-full left-0 w-full bg-white shadow-lg z-50 rounded mt-1">
                   {loading ? (
@@ -179,8 +180,8 @@ const Navbar = () => {
                       >
                         <img
                           src={item.thumbnail}
-                          alt=""
                           className="w-10 h-10 object-contain"
+                          alt={item.title}
                         />
                         <p className="text-sm">{item.title}</p>
                       </div>
@@ -193,32 +194,37 @@ const Navbar = () => {
             </form>
 
             {!hideIcons && (
-              <div className="flex items-center gap-4 text-xl">
-                {/* WISHLIST */}
+              <div className="flex items-center gap-5 lg:gap-7 text-xl text-gray-800">
+                {' '}
+                {/* Wishlist */}
                 <div className="relative">
+                  <Link
+                    to="/wishlist"
+                    className="text-xl hover:text-red-600 transition"
+                  >
+                    <FaRegHeart />
+                  </Link>
                   {wishlistCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">
+                    <span className="absolute -top-2 -right-1.5 bg-red-500 text-white text-[10px] font-semibold px-1.5 py-px rounded-full">
                       {wishlistCount > 99 ? '99+' : wishlistCount}
                     </span>
                   )}
-                  <Link to="/wishlist">
-                    <FaRegHeart />
-                  </Link>
                 </div>
-
-                {/* CART */}
+                {/* Cart */}
                 <div className="relative">
+                  <Link
+                    to="/cart"
+                    className="text-xl hover:text-red-600 transition"
+                  >
+                    <IoCartOutline />
+                  </Link>
                   {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">
+                    <span className="absolute -top-2 -right-1 bg-red-500 text-white text-[10px] font-semibold px-1.5 py-px rounded-full">
                       {cartCount > 99 ? '99+' : cartCount}
                     </span>
                   )}
-                  <Link to="/cart">
-                    <IoCartOutline />
-                  </Link>
                 </div>
-
-                {/* USER DROPDOWN – with outside click close */}
+                {/* User Dropdown */}
                 <div className="relative" ref={dropdownRef}>
                   <div
                     onClick={() => setShowAcc(!showAcc)}
@@ -226,44 +232,138 @@ const Navbar = () => {
                   >
                     <LuUser />
                   </div>
-
-                  {showAcc && (
-                    <div className="absolute right-0 top-12 w-[225px] bg-[#7D6C8C]/60 backdrop-blur-md rounded-sm shadow-lg px-5 py-4 z-50">
-                      <ul className="font-poppins font-normal text-[14px] leading-[21px] text-[#FAFAFA] space-y-[18px]">
-                        <li>
-                          <Link
-                            to="/myAccount"
+                  <div
+                    className={`absolute right-0 top-12 w-[225px] bg-[#7D6C8C]/60 backdrop-blur-md rounded-sm shadow-lg px-5 py-4 z-50 transition-all duration-300 ${showAcc ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'}`}
+                  >
+                    <ul className="font-poppins font-normal text-[14px] leading-[21px] text-[#FAFAFA] space-y-[18px]">
+                      {user ? (
+                        <>
+                          <li>
+                            <Link
+                              to="/myAccount"
+                              onClick={() => setShowAcc(false)}
+                              className="flex items-center gap-3"
+                            >
+                              <LuUser /> Manage My Account
+                            </Link>
+                          </li>
+                          <li className="flex items-center gap-3 cursor-pointer">
+                            <LuShoppingBag /> My Orders
+                          </li>
+                          <li className="flex items-center gap-3 cursor-pointer">
+                            <LuStar /> My Reviews
+                          </li>
+                          <li
+                            onClick={handleLogout}
                             className="flex items-center gap-3 cursor-pointer"
-                            onClick={() => setShowAcc(false)} // optional: close on link click
                           >
-                            <LuUser className="text-2xl" /> Manage My Account
-                          </Link>
-                        </li>
-                        <li className="flex items-center gap-3 cursor-pointer">
-                          <LuShoppingBag className="text-2xl" /> My Order
-                        </li>
-                        <li className="flex items-center gap-3 cursor-pointer">
-                          <AiOutlineCloseCircle className="text-2xl" /> My
-                          Cancellations
-                        </li>
-                        <li className="flex items-center gap-3 cursor-pointer">
-                          <LuStar className="text-2xl" /> My Reviews
-                        </li>
-                        <li>
-                          <Link
-                            to="/signup"
-                            className="flex items-center gap-3 cursor-pointer"
-                            onClick={() => setShowAcc(false)}
-                          >
-                            <TbLogout2 className="text-2xl" /> Logout
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
-                  )}
+                            <TbLogout2 /> Logout
+                          </li>
+                        </>
+                      ) : (
+                        <>
+                          <li>
+                            <Link to="/login" onClick={() => setShowAcc(false)}>
+                              Login
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              to="/signup"
+                              onClick={() => setShowAcc(false)}
+                            >
+                              Sign Up
+                            </Link>
+                          </li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
                 </div>
+                {/* Mobile Hamburger */}
+                <button
+                  className="lg:hidden text-2xl p-1 -mr-1"
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  aria-label="Toggle menu"
+                >
+                  <RxHamburgerMenu />
+                </button>
               </div>
             )}
+
+            {hideIcons && (
+              <button
+                className="lg:hidden text-2xl text-gray-800 p-1"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                <RxHamburgerMenu />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <div
+          className={`lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          onClick={closeMenu}
+        >
+          <div
+            className={`fixed top-0 left-0 h-full w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center px-4 py-4 border-b">
+              <img src={logo} className="h-9 w-auto" alt="Logo" />
+              <AiOutlineCloseCircle
+                className="text-2xl cursor-pointer"
+                onClick={closeMenu}
+              />
+            </div>
+
+            {/* Mobile Menu Links */}
+            <ul className="flex flex-col px-4 py-6 gap-6">
+              <li>
+                <Link to="/" onClick={closeMenu}>
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link to="/shop" onClick={closeMenu}>
+                  Shop
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" onClick={closeMenu}>
+                  Contact
+                </Link>
+              </li>
+              <li>
+                <Link to="/about" onClick={closeMenu}>
+                  About
+                </Link>
+              </li>
+              {!user && (
+                <li>
+                  <Link to="/signup" onClick={closeMenu}>
+                    Sign Up
+                  </Link>
+                </li>
+              )}
+              {user && (
+                <>
+                  <li>
+                    <Link to="/myAccount" onClick={closeMenu}>
+                      My Account
+                    </Link>
+                  </li>
+                  <li>My Orders</li>
+                  <li>My Reviews</li>
+                  <li onClick={handleLogout} className="cursor-pointer">
+                    Logout
+                  </li>
+                </>
+              )}
+            </ul>
           </div>
         </div>
       </div>
