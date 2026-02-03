@@ -23,6 +23,7 @@ import CategoryProduct from './Components/CategoryProduct/CategoryProduct.jsx';
 import AuthProvider from './context/AuthContext';
 import PrivateRoute from './routes/PrivateRoute.jsx';
 import OrderSuccess from './Components/OrderSuccess/OrderSuccess.jsx';
+import TrackOrder from './Components/TrackOrder/TrackOrder.jsx';
 const router = createBrowserRouter([
   {
     path: '/',
@@ -50,6 +51,7 @@ const router = createBrowserRouter([
       { path: 'products/category/:slug', Component: CategoryProduct },
       { path: '*', Component: NotFound },
       { path: '/order-success', Component: OrderSuccess },
+      { path: '/track-order', Component: TrackOrder},
     ],
   },
 ]);

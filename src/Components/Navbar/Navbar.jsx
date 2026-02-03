@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MdOutlineKeyboardArrowDown } from 'react-icons/md';
 import { LuShoppingBag, LuStar } from 'react-icons/lu';
 import { AiOutlineCloseCircle } from 'react-icons/ai';
@@ -33,6 +33,30 @@ const Navbar = () => {
 
   const hideIcons =
     location.pathname === '/signup' || location.pathname === '/login';
+
+  // Ref for dropdown container (to detect outside click)
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = event => {
+      if (
+        showAcc &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        setShowAcc(false);
+      }
+    };
+
+    // Add event listener to whole document
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // Cleanup on unmount
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showAcc]); // Re-run when showAcc changes
 
   /* ================= LIVE SEARCH DROPDOWN ================= */
   useEffect(() => {
@@ -194,46 +218,50 @@ const Navbar = () => {
                   </Link>
                 </div>
 
-                {/* USER */}
-                <div
-                  onClick={() => setShowAcc(!showAcc)}
-                  className="w-8 h-8 rounded-full bg-[#DB4444] text-white flex items-center justify-center cursor-pointer"
-                >
-                  <LuUser />
-                </div>
-
-                {showAcc && (
-                  <div className="absolute right-0 top-12 w-[225px] bg-[#7D6C8C]/60 backdrop-blur-md rounded-sm shadow-lg px-5 py-4 z-50">
-                    <ul className="font-poppins font-normal text-[14px] leading-[21px] text-[#FAFAFA] space-y-[18px]">
-                      <li>
-                        <Link
-                          to="/myAccount"
-                          className="flex items-center gap-3 cursor-pointer"
-                        >
-                          <LuUser className="text-2xl" /> Manage My Account
-                        </Link>
-                      </li>
-                      <li className="flex items-center gap-3 cursor-pointer">
-                        <LuShoppingBag className="text-2xl" /> My Order
-                      </li>
-                      <li className="flex items-center gap-3 cursor-pointer">
-                        <AiOutlineCloseCircle className="text-2xl" /> My
-                        Cancellations
-                      </li>
-                      <li className="flex items-center gap-3 cursor-pointer">
-                        <LuStar className="text-2xl" /> My Reviews
-                      </li>
-                      <li>
-                        <Link
-                          to="/signup"
-                          className="flex items-center gap-3 cursor-pointer"
-                        >
-                          <TbLogout2 className="text-2xl" /> Logout
-                        </Link>
-                      </li>
-                    </ul>
+                {/* USER DROPDOWN – with outside click close */}
+                <div className="relative" ref={dropdownRef}>
+                  <div
+                    onClick={() => setShowAcc(!showAcc)}
+                    className="w-8 h-8 rounded-full bg-[#DB4444] text-white flex items-center justify-center cursor-pointer"
+                  >
+                    <LuUser />
                   </div>
-                )}
+
+                  {showAcc && (
+                    <div className="absolute right-0 top-12 w-[225px] bg-[#7D6C8C]/60 backdrop-blur-md rounded-sm shadow-lg px-5 py-4 z-50">
+                      <ul className="font-poppins font-normal text-[14px] leading-[21px] text-[#FAFAFA] space-y-[18px]">
+                        <li>
+                          <Link
+                            to="/myAccount"
+                            className="flex items-center gap-3 cursor-pointer"
+                            onClick={() => setShowAcc(false)} // optional: close on link click
+                          >
+                            <LuUser className="text-2xl" /> Manage My Account
+                          </Link>
+                        </li>
+                        <li className="flex items-center gap-3 cursor-pointer">
+                          <LuShoppingBag className="text-2xl" /> My Order
+                        </li>
+                        <li className="flex items-center gap-3 cursor-pointer">
+                          <AiOutlineCloseCircle className="text-2xl" /> My
+                          Cancellations
+                        </li>
+                        <li className="flex items-center gap-3 cursor-pointer">
+                          <LuStar className="text-2xl" /> My Reviews
+                        </li>
+                        <li>
+                          <Link
+                            to="/signup"
+                            className="flex items-center gap-3 cursor-pointer"
+                            onClick={() => setShowAcc(false)}
+                          >
+                            <TbLogout2 className="text-2xl" /> Logout
+                          </Link>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
