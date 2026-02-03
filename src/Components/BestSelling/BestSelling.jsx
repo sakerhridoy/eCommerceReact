@@ -84,12 +84,12 @@ const BestSelling = () => {
                   Best Selling Products
                 </h2>
 
-                <a
-                  href=""
+                <Link
+                  to="/shop"
                   className="bg-[#DB4444] hover:bg-[#b80808] transition-all duration-300 text-center py-4 px-12 rounded-sm font-poppins font-medium text-base text-[#fafafa]"
                 >
                   View All
-                </a>
+                </Link>
               </div>
             </div>
           </div>

@@ -276,12 +276,12 @@ const FlashSales = () => {
         </div>
 
         <div className="text-center pb-[102px]">
-          <a
-            href=""
+          <Link
+            to="/shop"
             className="bg-[#DB4444] hover:bg-[#b80808] transition-all duration-300 py-4 px-12 rounded-sm text-white font-medium text-base"
           >
             View All Products
-          </a>
+          </Link>
         </div>
       </div>
     </section>

@@ -4,9 +4,11 @@ import { FaStar, FaRegHeart } from 'react-icons/fa6';
 import { IoEyeOutline } from 'react-icons/io5';
 import axios from 'axios';
 import { useShop } from '../../Context/ShopContext/ShopContext';
+import Swal from 'sweetalert2';
 
 const Shop = () => {
-  const { addToCart, wishlist, addToWishlist, removeFromWishlist } = useShop();
+  const { addToCart, wishlist, addToWishlist, removeFromWishlist, cart } =
+    useShop();
 
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -17,6 +19,19 @@ const Shop = () => {
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get('category') || '';
   const searchQuery = searchParams.get('search') || '';
+
+  // ================= SweetAlert2 Toast Config (reusable) =================
+  const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: toast => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
+  });
 
   // ================= FETCH CATEGORIES =================
   useEffect(() => {
@@ -98,18 +113,42 @@ const Shop = () => {
             <div className="grid grid-cols-3 gap-8">
               {currentProducts.map(item => {
                 const isWished = wishlist.some(w => w.id === item.id);
+                const isInCart = cart.some(c => c.id === item.id);
+
+                const handleAddToCart = () => {
+                  if (isInCart) {
+                    Toast.fire({
+                      icon: 'info',
+                      title: `${item.name} is already in your cart!`,
+                    });
+                  } else {
+                    addToCart(item);
+                    Toast.fire({
+                      icon: 'success',
+                      title: `${item.name} added to cart!`,
+                    });
+                  }
+                };
 
                 const handleToggleWishlist = () => {
                   if (isWished) {
                     removeFromWishlist(item.id);
+                    Toast.fire({
+                      icon: 'warning',
+                      title: `${item.name} removed from wishlist`,
+                    });
                   } else {
                     addToWishlist(item);
+                    Toast.fire({
+                      icon: 'success',
+                      title: `${item.name} added to wishlist! ❤️`,
+                    });
                   }
                 };
 
                 return (
                   <div key={item.id} className="group">
-                    <div className=" bg-[#F5F5F5] py-10 rounded relative overflow-hidden">
+                    <div className="bg-[#F5F5F5] py-10 rounded relative overflow-hidden">
                       <Link to={`/product/${item.id}`}>
                         <img
                           src={item.img}
@@ -141,9 +180,10 @@ const Shop = () => {
                           <IoEyeOutline />
                         </Link>
                       </div>
+
                       {/* ADD TO CART */}
                       <div
-                        onClick={() => addToCart(item)}
+                        onClick={handleAddToCart}
                         className="absolute left-0 bottom-[-45px] w-full bg-black text-white text-center py-2 cursor-pointer opacity-0 group-hover:bottom-0 group-hover:opacity-100 transition-all"
                       >
                         Add To Cart
