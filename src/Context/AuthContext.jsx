@@ -20,6 +20,7 @@ const AuthProvider = ({ children }) => {
   const signup = async (email, password, name) => {
     const res = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(res.user, { displayName: name });
+    setUser(res.user);
     return res;
   };
 
@@ -39,7 +40,15 @@ const AuthProvider = ({ children }) => {
     return unsub;
   }, []);
 
-  const value = { user, signup, login, logout, loading };
+  // 🔥 setUser export kora hoise
+  const value = {
+    user,
+    setUser,
+    signup,
+    login,
+    logout,
+    loading,
+  };
 
   return (
     <AuthContext.Provider value={value}>

@@ -22,6 +22,7 @@ import ProductDetails from './Components/ProductDetails/ProductDetails.jsx';
 import CategoryProduct from './Components/CategoryProduct/CategoryProduct.jsx';
 import AuthProvider from './context/AuthContext';
 import PrivateRoute from './routes/PrivateRoute.jsx';
+import OrderSuccess from './Components/OrderSuccess/OrderSuccess.jsx';
 const router = createBrowserRouter([
   {
     path: '/',
@@ -48,6 +49,7 @@ const router = createBrowserRouter([
       { path: 'product/:id', Component: ProductDetails },
       { path: 'products/category/:slug', Component: CategoryProduct },
       { path: '*', Component: NotFound },
+      { path: '/order-success', Component: OrderSuccess },
     ],
   },
 ]);

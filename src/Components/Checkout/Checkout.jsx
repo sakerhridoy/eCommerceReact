@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useShop } from '../../Context/ShopContext/ShopContext';
-import bkash from '../../assets/Images/Bkash.png'
-import visa from '../../assets/Images/Visa.png'
-import master from '../../assets/Images/Mastercard.png'
-import nagad from '../../assets/Images/Nagad.png'
+import bkash from '../../assets/Images/Bkash.png';
+import visa from '../../assets/Images/Visa.png';
+import master from '../../assets/Images/Mastercard.png';
+import nagad from '../../assets/Images/Nagad.png';
 
 const Checkout = () => {
   const { cart } = useShop();
-  const shippingCost = 0; 
+  const navigate = useNavigate();
+
+  const shippingCost = 0;
   const subtotal = cart.reduce(
     (acc, item) => acc + item.dPrice * item.quantity,
-    0
+    0,
   );
   const total = subtotal + shippingCost;
 
-  // Form state
   const [form, setForm] = useState({
     firstName: '',
     companyName: '',
@@ -28,35 +30,101 @@ const Checkout = () => {
     coupon: '',
   });
 
-  // Form errors
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [couponStatus, setCouponStatus] = useState('');
 
-  // Handle input change
-  const handleChange = e => {
-    const { name, value, type, checked } = e.target;
-    setForm(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+  const validateField = (name, value) => {
+    let error = '';
+
+    if (
+      ['firstName', 'address', 'city', 'phone', 'email'].includes(name) &&
+      !value.trim()
+    ) {
+      error = `${name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, ' $1')} is required`;
+    }
+
+    if (name === 'phone' && value) {
+      if (!/^(01[3-9]\d{8}|\+8801[3-9]\d{8})$/.test(value)) {
+        error = 'Invalid phone (use 01XXXXXXXXX or +8801XXXXXXXXX)';
+      }
+    }
+
+    if (name === 'email' && value) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        error = 'Invalid email format';
+      }
+    }
+
+    return error;
   };
 
-  // Form validation
-  const validate = () => {
+  const validateForm = () => {
     const newErrors = {};
-    if (!form.firstName) newErrors.firstName = 'First Name is required';
-    if (!form.address) newErrors.address = 'Street Address is required';
-    if (!form.city) newErrors.city = 'Town/City is required';
-    if (!form.phone) newErrors.phone = 'Phone Number is required';
-    if (!form.email) newErrors.email = 'Email Address is required';
+    ['firstName', 'address', 'city', 'phone', 'email'].forEach(field => {
+      const err = validateField(field, form[field]);
+      if (err) newErrors[field] = err;
+    });
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle Place Order
+  const handleChange = e => {
+    const { name, value, type, checked } = e.target;
+    const inputValue = type === 'checkbox' ? checked : value;
+
+    setForm(prev => ({ ...prev, [name]: inputValue }));
+
+    // Live validation for phone & email
+    if (['phone', 'email'].includes(name)) {
+      const err = validateField(name, inputValue);
+      setErrors(prev => ({ ...prev, [name]: err }));
+    }
+  };
+
+  const handleBlur = e => {
+    const { name, value } = e.target;
+    const err = validateField(name, value);
+    setErrors(prev => ({ ...prev, [name]: err }));
+  };
+
+  const handleApplyCoupon = () => {
+    const code = form.coupon.trim().toUpperCase();
+    if (code === 'SAVE10' || code === 'WELCOME10') {
+      setCouponStatus('Coupon applied! 10% off');
+    } else if (code) {
+      setCouponStatus('Invalid coupon code');
+    } else {
+      setCouponStatus('');
+    }
+  };
+
   const handlePlaceOrder = e => {
     e.preventDefault();
-    if (!validate()) return;
-    alert('Order placed successfully!');
+
+    if (cart.length === 0) {
+      alert('Your cart is empty!');
+      return;
+    }
+
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+
+    // Simulate order processing (you can replace with real API call later)
+    setTimeout(() => {
+      const fakeOrderNumber =
+        'ORD' + Math.floor(100000 + Math.random() * 900000);
+
+      navigate('/order-success', {
+        state: {
+          orderNumber: fakeOrderNumber,
+          total: total.toFixed(2),
+        },
+      });
+
+      setIsSubmitting(false);
+    }, 1200);
   };
 
   return (
@@ -83,6 +151,7 @@ const Checkout = () => {
                   name="firstName"
                   value={form.firstName}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   className="w-full rounded-sm p-3 outline-0 bg-[#F5F5F5]"
                 />
                 {errors.firstName && (
@@ -113,6 +182,7 @@ const Checkout = () => {
                   name="address"
                   value={form.address}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   className="w-full rounded-sm p-3 outline-0 bg-[#F5F5F5]"
                 />
                 {errors.address && (
@@ -141,6 +211,7 @@ const Checkout = () => {
                   name="city"
                   value={form.city}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   className="w-full rounded-sm p-3 outline-0 bg-[#F5F5F5]"
                 />
                 {errors.city && (
@@ -153,10 +224,11 @@ const Checkout = () => {
                   <span className="text-[rgba(219,68,68,0.4)]">*</span>
                 </label>
                 <input
-                  type="text"
+                  type="tel"
                   name="phone"
                   value={form.phone}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   className="w-full rounded-sm p-3 outline-0 bg-[#F5F5F5]"
                 />
                 {errors.phone && (
@@ -173,6 +245,7 @@ const Checkout = () => {
                   name="email"
                   value={form.email}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   className="w-full rounded-sm p-3 outline-0 bg-[#F5F5F5]"
                 />
                 {errors.email && (
@@ -208,14 +281,14 @@ const Checkout = () => {
                     />
                     <span>{item.name}</span>
                   </div>
-                  <span>${item.dPrice * item.quantity}</span>
+                  <span>${(item.dPrice * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
               <div className="flex justify-between pb-4 border-b border-black/40">
                 <span className="font-poppins font-normal text-base text-black">
                   Subtotal:
                 </span>
-                <span>${subtotal}</span>
+                <span>${subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between pb-4 border-b border-black/40">
                 <span className="font-poppins font-normal text-base text-black">
@@ -228,7 +301,7 @@ const Checkout = () => {
                   Total:
                 </span>
                 <span className="font-poppins font-normal text-base text-black">
-                  ${total}
+                  ${total.toFixed(2)}
                 </span>
               </div>
 
@@ -246,22 +319,16 @@ const Checkout = () => {
                     />
                     Bank
                   </label>
-                  <div className="absolute right-0 top-0">
-                    <div className="flex items-center gap-2">
-                      <a href="">
-                        <img src={bkash} alt="Visa" />
-                      </a>
-                      <a href="">
-                        <img src={visa} alt="Mastercard" />
-                      </a>
-                      <a href="">
-                        <img src={master} alt="Bkash" />
-                      </a>
-                      <a href="">
+                  {form.paymentMethod === 'bank' && (
+                    <div className="absolute right-0 top-0">
+                      <div className="flex items-center gap-2">
+                        <img src={bkash} alt="bKash" />
                         <img src={nagad} alt="Nagad" />
-                      </a>
+                        <img src={visa} alt="Visa" />
+                        <img src={master} alt="Mastercard" />
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
                 <label className="flex items-center gap-2">
                   <input
@@ -286,16 +353,33 @@ const Checkout = () => {
                   placeholder="Coupon Code"
                   className="flex-1 border border-black text-black/50 rounded-sm font-poppins font-medium text-base leading-6 py-4 px-6 outline-0"
                 />
-                <button className="bg-[#DB4444] text-white py-4 px-6 rounded-sm font-poppins font-medium text-base leading-6">
+                <button
+                  type="button"
+                  onClick={handleApplyCoupon}
+                  className="bg-[#DB4444] text-white py-4 px-6 rounded-sm font-poppins font-medium text-base leading-6"
+                >
                   Apply Coupon
                 </button>
               </div>
+              {couponStatus && (
+                <p
+                  className={`text-sm mt-1 ${couponStatus.includes('Invalid') ? 'text-red-500' : 'text-green-600'}`}
+                >
+                  {couponStatus}
+                </p>
+              )}
 
               <button
-                onClick={handlePlaceOrder}
-                className="bg-[#DB4444] text-white py-4 px-6 rounded-sm font-poppins font-medium text-base leading-6 mt-4"
+                type="button" // ← changed from submit
+                onClick={handlePlaceOrder} // ← moved here
+                disabled={isSubmitting || cart.length === 0}
+                className={`bg-[#DB4444] text-white py-4 px-12 rounded-sm font-poppins font-medium text-base leading-6 mt-4 ${
+                  isSubmitting || cart.length === 0
+                    ? 'opacity-60 cursor-not-allowed'
+                    : ''
+                }`}
               >
-                Place Order
+                {isSubmitting ? 'Processing...' : 'Place Order'}
               </button>
             </div>
           </div>
