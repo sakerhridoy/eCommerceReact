@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MdOutlineKeyboardArrowDown } from 'react-icons/md';
+import { MdOutlineLanguage } from 'react-icons/md';
 import { FiSearch } from 'react-icons/fi';
 import { FaRegHeart } from 'react-icons/fa6';
 import { IoCartOutline } from 'react-icons/io5';
@@ -24,6 +24,8 @@ const Navbar = () => {
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [mobileLangOpen, setMobileLangOpen] = useState(false);
+  const [language, setLanguage] = useState('English'); // selected language
 
   const dropdownRef = useRef(null);
   const hideIcons =
@@ -45,10 +47,13 @@ const Navbar = () => {
       ) {
         setShowAcc(false);
       }
+      if (mobileLangOpen && !event.target.closest('#mobile-lang-btn')) {
+        setMobileLangOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showAcc]);
+  }, [showAcc, mobileLangOpen]);
 
   // Mobile menu scroll lock
   useEffect(() => {
@@ -96,13 +101,59 @@ const Navbar = () => {
 
   return (
     <nav className="border-b border-gray-200/70 bg-white sticky top-0 z-50">
-      {/* Top Bar */}
-      <div className="bg-black py-2.5 text-white text-center text-[10px] sm:text-sm">
-        <div className="container flex justify-center items-center">
-          Summer Sale For All Swim Suits And Free Express Delivery - OFF 50%!
-          <Link to="/shop" className="underline ps-2">
-            ShopNow
-          </Link>
+      <div className="bg-black py-2.5 text-white text-[10px] sm:text-sm px-4 lg:px-0">
+        <div className="container flex justify-end-safe gap-20 lg:gap-[270px] items-center">
+          <p className="">
+            <span className='hidden sm:inline-block'>Summer Sale For All Swim Suits And</span> Free ExpressDelivery - OFF 50%!
+            <Link to="/shop" className="underline ps-2 sm:ps-4">
+              ShopNow
+            </Link>
+          </p>
+
+          {/* Desktop Language Selector */}
+          <div className="hidden sm:block">
+            <select
+              value={language}
+              onChange={e => setLanguage(e.target.value)}
+              className="text-white bg-black outline-none px-2 py-1 rounded"
+            >
+              <option value="English" className="bg-black text-white">
+                English
+              </option>
+              <option value="Bangla" className="bg-black text-white">
+                Bangla
+              </option>
+            </select>
+          </div>
+
+          {/* Mobile Language Icon */}
+          <div className="sm:hidden relative">
+            <button
+              id="mobile-lang-btn"
+              onClick={() => setMobileLangOpen(!mobileLangOpen)}
+              className="text-white text-xl"
+            >
+              <MdOutlineLanguage />
+            </button>
+            {mobileLangOpen && (
+              <div className="absolute right-0 mt-2 w-32 bg-white text-black rounded shadow-lg z-50">
+                <ul>
+                  {['English', 'Bangla'].map(lang => (
+                    <li
+                      key={lang}
+                      className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                      onClick={() => {
+                        setLanguage(lang);
+                        setMobileLangOpen(false);
+                      }}
+                    >
+                      {lang}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -144,10 +195,7 @@ const Navbar = () => {
               </li>
             )}
           </ul>
-
-          {/* Right */}
           <div className="flex items-center gap-4 lg:gap-6">
-            {/* Search */}
             <form
               onSubmit={handleSearchSubmit}
               className="relative hidden sm:block min-w-[220px] md:min-w-[320px]"
@@ -195,7 +243,6 @@ const Navbar = () => {
 
             {!hideIcons && (
               <div className="flex items-center gap-5 lg:gap-7 text-xl text-gray-800">
-                {' '}
                 {/* Wishlist */}
                 <div className="relative">
                   <Link

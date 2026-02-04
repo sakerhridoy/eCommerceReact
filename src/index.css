@@ -12,6 +12,10 @@
 .banner_menu a{
   @apply font-poppins font-normal text-base text-black leading-6 cursor-pointer text-left;
 }
+ body::selection {
+    background-color: #DB4444;
+    color: white;
+  }
 @layer {
   .slick-dots{
     position: absolute;
