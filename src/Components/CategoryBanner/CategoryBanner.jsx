@@ -1,6 +1,6 @@
 import React from 'react';
 import categoryBanner from '../../assets/Images/categoryBanner.png';
-import { useCountdown } from '../../Context/Provider/CountDownContextProvider';
+import { useCountdown } from '../../context/Provider/CountDownContextProvider';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router';
 
@@ -61,7 +61,7 @@ const CategoryBanner = () => {
                       </div>
                       <div className="flex gap-2 items-center mb-16.25">
                         <Link
-                          to='/checkout'
+                          to="/checkout"
                           className="bg-[#00FF66] hover:bg-[#00ff66de] duration-300 hover:text-white text-center py-4 px-12 rounded-sm font-poppins font-medium text-base text-[#fafafa] leading-6"
                         >
                           Buy Now!

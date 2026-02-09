@@ -8,14 +8,14 @@ import { FaStar, FaRegHeart } from 'react-icons/fa6';
 import { GoArrowLeft, GoArrowRight } from 'react-icons/go';
 import { IoEyeOutline } from 'react-icons/io5';
 
-import { useCountdown } from '../../Context/Provider/CountDownContextProvider';
+import { useCountdown } from '../../context/Provider/CountDownContextProvider';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { Link } from 'react-router';
-import { useShop } from '../../Context/ShopContext/ShopContext';
+import { useShop } from '../../context/ShopContext/ShopContext';
 
 const FlashSales = () => {
   const { seconds, minutes, hours, days } = useCountdown();

@@ -9,7 +9,7 @@ import { TbLogout2 } from 'react-icons/tb';
 import { RxHamburgerMenu } from 'react-icons/rx';
 import logo from '../../assets/Images/logo.png';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useShop } from '../../Context/ShopContext/ShopContext';
+import { useShop } from '../../context/ShopContext/ShopContext';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 
@@ -104,7 +104,10 @@ const Navbar = () => {
       <div className="bg-black py-2.5 text-white text-[10px] sm:text-sm px-4 lg:px-0">
         <div className="container flex justify-end-safe gap-20 lg:gap-67.5 items-center">
           <p className="">
-            <span className='hidden md:inline-block'>Summer Sale For All Swim Suits And</span> Free ExpressDelivery - OFF 50%!
+            <span className="hidden md:inline-block">
+              Summer Sale For All Swim Suits And
+            </span>{' '}
+            Free ExpressDelivery - OFF 50%!
             <Link to="/shop" className="underline ps-2 sm:ps-4">
               ShopNow
             </Link>

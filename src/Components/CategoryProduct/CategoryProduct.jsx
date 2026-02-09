@@ -1,28 +1,26 @@
-import React, { useEffect, useState } from 'react'
-import explore from '../../assets/images/explore.png'
-import { FaStar } from "react-icons/fa";
-import { FaRegHeart } from "react-icons/fa";
-import { IoEyeOutline } from "react-icons/io5";
-import { Link , useParams} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import explore from '../../assets/images/explore.png';
+import { FaStar } from 'react-icons/fa';
+import { FaRegHeart } from 'react-icons/fa';
+import { IoEyeOutline } from 'react-icons/io5';
+import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { useShop } from '../../Context/ShopContext/ShopContext';
+import { useShop } from '../../context/ShopContext/ShopContext';
 
 const CategoryProduct = () => {
+  const { addToCart, addToWishlist } = useShop();
+  const [cateProducts, setCateProducts] = useState([]);
+  const { slug } = useParams();
+  console.log(slug);
 
-    const { addToCart, addToWishlist } = useShop();
-    const [cateProducts, setCateProducts] = useState([])
-    const { slug } = useParams()
-    console.log(slug);
-        
-    useEffect(() => {
+  useEffect(() => {
+    axios
+      .get(`https://dummyjson.com/products/category/${slug}`)
+      .then(res => setCateProducts(res.data.products))
+      .catch(err => console.error(err));
+  }, [slug]);
 
-        axios
-            .get(`https://dummyjson.com/products/category/${slug}`)
-            .then(res => setCateProducts(res.data.products))
-            .catch(err => console.error(err))
-    }, [slug]);
-
-    const [visibleCount, setVisibleCount] = useState(4)
+  const [visibleCount, setVisibleCount] = useState(4);
 
   return (
     <>
@@ -108,6 +106,6 @@ const CategoryProduct = () => {
       </section>
     </>
   );
-}
+};
 
-export default CategoryProduct
+export default CategoryProduct;

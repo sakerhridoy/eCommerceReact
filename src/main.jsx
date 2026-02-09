@@ -2,8 +2,8 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
 
-import CountdownContextProvider from './Context/Provider/CountDownContextProvider.jsx';
-import { ShopProvider } from './Context/ShopContext/ShopContext.jsx';
+import CountdownContextProvider from './context/CountDownContext/CountDownContext.js';
+import { ShopProvider } from './context/ShopContext/ShopContext.jsx';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
@@ -51,7 +51,7 @@ const router = createBrowserRouter([
       { path: 'products/category/:slug', Component: CategoryProduct },
       { path: '*', Component: NotFound },
       { path: '/order-success', Component: OrderSuccess },
-      { path: '/track-order', Component: TrackOrder},
+      { path: '/track-order', Component: TrackOrder },
     ],
   },
 ]);

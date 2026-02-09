@@ -5,7 +5,7 @@ import bSelling3 from '../../assets/images/bSelling3.png';
 import bSelling4 from '../../assets/images/bSelling4.png';
 import { FaStar, FaStarHalfAlt, FaRegHeart } from 'react-icons/fa';
 import { IoEyeOutline } from 'react-icons/io5';
-import { useShop } from '../../Context/ShopContext/ShopContext';
+import { useShop } from '../../context/ShopContext/ShopContext';
 import { Link } from 'react-router';
 
 const BestSelling = () => {
@@ -67,7 +67,7 @@ const BestSelling = () => {
   };
 
   return (
-    <section className='mx-4 xl:mx-0'>
+    <section className="mx-4 xl:mx-0">
       <div className="container">
         <div className="section-title border-t border-[rgba(0,0,0,0.3)]">
           <div className="mb-7.75 pt-20">
@@ -155,7 +155,7 @@ const BestSelling = () => {
             );
           })}
         </div>
-        <div className='block lg:hidden pb-15'>
+        <div className="block lg:hidden pb-15">
           <Link
             to="/shop"
             className="bg-[#DB4444] hover:bg-[#b80808] transition-all duration-300 text-center py-4 px-12 rounded-sm font-poppins font-medium text-base text-[#fafafa] w-max"
