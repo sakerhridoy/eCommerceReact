@@ -8,7 +8,7 @@ import { FaStar, FaRegHeart } from 'react-icons/fa6';
 import { GoArrowLeft, GoArrowRight } from 'react-icons/go';
 import { IoEyeOutline } from 'react-icons/io5';
 
-import { useCountdown } from '../../context/Provider/CountDownContextProvider';
+import { useCountdown } from '../../context/CountDownContext/CountDownContextProvider';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';

@@ -1,12 +1,10 @@
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
-
-import  CountdownContextProvider from './context/Provider/CountDownContextProvider.jsx';
 import { ShopProvider } from './context/ShopContext/ShopContext.jsx';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-
+import CountDownContextProvider from './context/CountDownContext/CountDownContextProvider.jsx';
 import MainRoute from './Components/MainRoute/MainRoute.jsx';
 import Shop from './Components/Shop/Shop.jsx';
 import NotFound from './Components/NotFound/NotFound.jsx';
@@ -57,11 +55,11 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById('root')).render(
-  <CountdownContextProvider>
+  <CountDownContextProvider>
     <ShopProvider>
       <AuthProvider>
         <RouterProvider router={router} />
       </AuthProvider>
     </ShopProvider>
-  </CountdownContextProvider>,
+  </CountDownContextProvider>,
 );
