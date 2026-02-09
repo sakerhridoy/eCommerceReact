@@ -3,7 +3,7 @@ import './index.css';
 import App from './App.jsx';
 
 import CountdownContextProvider from './Context/Provider/CountDownContextProvider.jsx';
-import { ShopProvider } from './Context/ShopContext/ShopContext';
+import { ShopProvider } from './Context/ShopContext/ShopContext.jsx';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
