@@ -24,11 +24,11 @@ const Category = () => {
   }, []);
 
   return (
-    <section className="pb-[120px] pt-[60px] mx-4 xl:mx-0">
+    <section className="pb-30 pt-15 mx-4 xl:mx-0">
       <div className="container">
         <div className="section-title border-t border-[rgba(0,0,0,0.3)]">
-          <div className="section-title mb-[31px] pt-20">
-            <div className="mb-[13px] relative after:absolute after:w-5 after:h-full after:bg-[#DB4444] after:left-0 after:top-0 after:rounded-sm ps-9">
+          <div className="section-title mb-7.75 pt-20">
+            <div className="mb-3.25 relative after:absolute after:w-5 after:h-full after:bg-[#DB4444] after:left-0 after:top-0 after:rounded-sm ps-9">
               <h4 className="font-poppins font-semibold text-base text-[#DB4444] leading-10">
                 Categories
               </h4>
@@ -88,13 +88,13 @@ const Category = () => {
               swiper.navigation.init();
               swiper.navigation.update();
             }}
-            className="pb-[130px] pt-[60px]"
+            className="pb-32.5 pt-15"
           >
             {categories.map(item => (
               <SwiperSlide key={item.slug}>
                 <Link to={`/products/category/${item.slug}`}>
-                  <div className="pt-[25px] pb-6 border border-[rgba(0,0,0,0.1)] rounded-sm text-center group hover:bg-[#DB4444] cursor-pointer transition-all duration-300">
-                    <h3 className="font-poppins text-base text-black py-[22px] group-hover:text-white transition-colors duration-300">
+                  <div className="pt-6.25 pb-6 border border-[rgba(0,0,0,0.1)] rounded-sm text-center group hover:bg-[#DB4444] cursor-pointer transition-all duration-300">
+                    <h3 className="font-poppins text-base text-black py-5.5 group-hover:text-white transition-colors duration-300">
                       {item.name}
                     </h3>
                   </div>

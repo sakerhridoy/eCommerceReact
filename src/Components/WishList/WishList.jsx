@@ -15,7 +15,7 @@ const WishList = () => {
 
   if (!wishlist.length) {
     return (
-      <section className="pt-[95px] pb-[140px]">
+      <section className="pt-23.75 pb-35">
         <div className="container text-center">
           <p className="text-black/50">Your wishlist is empty.</p>
         </div>
@@ -24,17 +24,17 @@ const WishList = () => {
   }
 
   return (
-    <section className="pt-[95px] pb-[140px] mx-4 xl:mx-0">
+    <section className="pt-23.75 pb-35 mx-4 xl:mx-0">
       <div className="container">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {wishlist.map(item => (
             <div key={item.id} className="group relative">
               {/* Image Box */}
-              <div className="bg-[#F5F5F5] py-[35px] rounded-sm relative overflow-hidden">
+              <div className="bg-[#F5F5F5] py-8.75 rounded-sm relative overflow-hidden">
                 <img
                   src={getItemImage(item)}
                   alt={getItemName(item)}
-                  className="mx-auto w-[172px] transition-transform duration-300 group-hover:scale-90"
+                  className="mx-auto w-43 transition-transform duration-300 group-hover:scale-90"
                 />
 
                 {/* Discount (if present) */}

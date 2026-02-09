@@ -8,10 +8,10 @@ import { Link } from 'react-router';
 const NewArrival = () => {
   return (
     <>
-      <section className="pb-[140px] mx-4 xl:mx-0">
+      <section className="pb-35 mx-4 xl:mx-0">
         <div className="container">
           {/* TITLE */}
-          <div className="section-title mb-[60px]">
+          <div className="section-title mb-15">
             <div className="mb-5 relative after:absolute after:content-[''] after:w-5 after:h-full after:bg-[#DB4444] after:left-0 after:top-0 after:rounded-sm ps-9">
               <h4 className="font-poppins font-semibold text-base text-[#DB4444] leading-10">
                 Featured
@@ -25,20 +25,20 @@ const NewArrival = () => {
           </div>
 
           {/* MAIN GRID */}
-          <div className="flex flex-col lg:flex-row gap-[30px]">
+          <div className="flex flex-col lg:flex-row gap-7.5">
             {/* LEFT BIG CARD */}
-            <div className="w-full lg:w-1/2 bg-black pt-[90px] px-[30px] rounded-sm relative">
+            <div className="w-full lg:w-1/2 bg-black pt-22.5 px-7.5 rounded-sm relative">
               <img
-                className="w-full max-w-[511px] h-auto mx-auto"
+                className="w-full max-w-127.75 h-auto mx-auto"
                 src={newArrival1}
                 alt=""
               />
 
-              <div className="w-[242px] absolute bottom-8 left-8">
+              <div className="w-60.5 absolute bottom-8 left-8">
                 <h4 className="font-inter font-semibold text-2xl text-[#fafafa] leading-6">
                   PlayStation 5
                 </h4>
-                <p className="font-poppins font-normal text-sm text-[#fafafa] leading-[21px] py-4">
+                <p className="font-poppins font-normal text-sm text-[#fafafa] leading-5.25 py-4">
                   Black and White version of the PS5 coming out on sale.
                 </p>
                 <Link
@@ -55,16 +55,16 @@ const NewArrival = () => {
               {/* TOP RIGHT */}
               <div className="bg-black rounded-sm relative flex justify-end">
                 <img
-                  className="w-full max-w-[432px] h-auto rounded-tr-sm rounded-br-sm"
+                  className="w-full max-w-108 h-auto rounded-tr-sm rounded-br-sm"
                   src={newArrival2}
                   alt=""
                 />
 
-                <div className="w-[242px] absolute bottom-8 left-8">
+                <div className="w-60.5 absolute bottom-8 left-8">
                   <h4 className="font-inter font-semibold text-2xl text-[#fafafa] leading-6">
                     Women’s Collections
                   </h4>
-                  <p className="font-poppins font-normal text-sm text-[#fafafa] leading-[21px] py-4">
+                  <p className="font-poppins font-normal text-sm text-[#fafafa] leading-5.25 py-4">
                     Featured woman collections that give you another vibe.
                   </p>
                   <Link
@@ -77,16 +77,16 @@ const NewArrival = () => {
               </div>
 
               {/* BOTTOM RIGHT */}
-              <div className="flex flex-col sm:flex-row gap-[30px]">
+              <div className="flex flex-col sm:flex-row gap-7.5">
                 {/* SPEAKERS */}
-                <div className="w-full sm:w-1/2 speakers py-[31px] px-[30px] relative rounded-sm">
+                <div className="w-full sm:w-1/2 speakers py-7.75 px-7.5 relative rounded-sm">
                   <img className="w-full h-auto" src={newArrival3} alt="" />
 
-                  <div className="w-[191px] absolute bottom-8 left-8">
+                  <div className="w-47.75 absolute bottom-8 left-8">
                     <h4 className="font-inter font-semibold text-2xl text-[#fafafa] leading-6">
                       Speakers
                     </h4>
-                    <p className="font-poppins font-normal text-sm text-[#fafafa] leading-[21px] py-2">
+                    <p className="font-poppins font-normal text-sm text-[#fafafa] leading-5.25 py-2">
                       Amazon wireless speakers
                     </p>
                     <Link
@@ -99,14 +99,14 @@ const NewArrival = () => {
                 </div>
 
                 {/* PERFUME */}
-                <div className="w-full sm:w-1/2 perfume py-[31px] px-[30px] relative rounded-sm">
+                <div className="w-full sm:w-1/2 perfume py-7.75 px-7.5 relative rounded-sm">
                   <img className="w-full h-auto" src={newArrival4} alt="" />
 
-                  <div className="w-[191px] absolute bottom-8 left-8">
+                  <div className="w-47.75 absolute bottom-8 left-8">
                     <h4 className="font-inter font-semibold text-2xl text-[#fafafa] leading-6">
                       Perfume
                     </h4>
-                    <p className="font-poppins font-normal text-sm text-[#fafafa] leading-[21px] py-2">
+                    <p className="font-poppins font-normal text-sm text-[#fafafa] leading-5.25 py-2">
                       GUCCI INTENSE OUD EDP
                     </p>
                     <Link

@@ -28,20 +28,20 @@ const CategoryProduct = () => {
     <>
       <section className="pt-8">
         <div className="container">
-          <div className="pb-[60px]">
-            <h4 className='font-inter font-semibold text-[16px] leading-5 text-[#DB4444] pl-[34px] relative after:w-5 after:h-10 after:absolute after:content-[""] after:-top-2.5 after:left-0 after:bg-red-500 after:rounded-sm'>
+          <div className="pb-15">
+            <h4 className='font-inter font-semibold text-[16px] leading-5 text-[#DB4444] pl-8.5 relative after:w-5 after:h-10 after:absolute after:content-[""] after:-top-2.5 after:left-0 after:bg-red-500 after:rounded-sm'>
               Category
             </h4>
-            <h2 className="pt-[34px] font-inter font-semibold text-[36px] leading-12 text-[#DB4444]">
+            <h2 className="pt-8.5 font-inter font-semibold text-[36px] leading-12 text-[#DB4444]">
               {' '}
               {slug}
             </h2>
           </div>
 
-          <div className="grid grid-cols-4 pb-[76px] gap-x-[30px] gap-y-[60px]">
+          <div className="grid grid-cols-4 pb-19 gap-x-7.5 gap-y-15">
             {cateProducts.slice(0, visibleCount).map((product, index) => (
               <div key={index}>
-                <div className="bg-[#F5F5F5] py-[35px] group rounded-sm mb-4 relative overflow-hidden">
+                <div className="bg-[#F5F5F5] py-8.75 group rounded-sm mb-4 relative overflow-hidden">
                   <Link to={`/product/${product.id}`}>
                     <img className="mx-auto" src={product.thumbnail} alt="" />
                   </Link>
@@ -55,14 +55,14 @@ const CategoryProduct = () => {
                   <div className="absolute top-3 right-3">
                     <button
                       onClick={() => addToWishlist(product)}
-                      className="w-[34px] h-[34px] bg-white rounded-full flex justify-center items-center mb-2"
+                      className="w-8.5 h-8.5 bg-white rounded-full flex justify-center items-center mb-2"
                       aria-label="Add to wishlist"
                     >
                       <FaRegHeart />
                     </button>
                     <Link
                       to={`/product/${product.id}`}
-                      className="w-[34px] h-[34px] bg-white rounded-full flex justify-center items-center"
+                      className="w-8.5 h-8.5 bg-white rounded-full flex justify-center items-center"
                       aria-label="View details"
                     >
                       <IoEyeOutline />
@@ -95,7 +95,7 @@ const CategoryProduct = () => {
             ))}
           </div>
           {visibleCount < cateProducts.length && (
-            <div className="pb-[91px] text-center">
+            <div className="pb-22.75 text-center">
               <a
                 onClick={() => setVisibleCount(visibleCount + 4)}
                 className="px-12 py-4 bg-[#DB4444] text-[#fafafa] text-[16px] leading-6 font-poppins font-medium rounded-sm"

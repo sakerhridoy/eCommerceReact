@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import banner from '../../assets/Images/banner.png';
 import iphone15 from '../../assets/Images/iphone15.png';
 import iphone16 from '../../assets/Images/iphone16.png';
-import iphone17 from '../../assets/Images/iphone17.png';
 import apple from '../../assets/Images/appleLogo.png';
 import { IoArrowForward } from 'react-icons/io5';
 import 'slick-carousel/slick/slick.css';
@@ -85,7 +84,7 @@ const Banner = () => {
   return (
     <section className="lg:mx-4 xl:mx-0">
       <div className="container">
-        <div className="flex flex-col lg:flex-row gap-[45px] justify-between">
+        <div className="flex flex-col lg:flex-row gap-11.25 justify-between">
           {/* ================= CATEGORY SIDEBAR ================= */}
           <div className="hidden lg:flex w-[20%] flex-col gap-6 pt-10 border-r border-black/20">
             {loading ? (
@@ -118,7 +117,7 @@ const Banner = () => {
               {bannerItems.map(item => (
                 <div key={item.id}>
                   {/* FIXED HEIGHT SLIDE */}
-                  <div className="bg-black h-[420px] lg:h-[420px] flex flex-col lg:flex-row gap-[38px] justify-center items-center lg:ps-16 pt-6 lg:pt-4 rounded-lg overflow-hidden">
+                  <div className="bg-black h-105 lg:h-105 flex flex-col lg:flex-row gap-9.5 justify-center items-center lg:ps-16 pt-6 lg:pt-4 rounded-lg overflow-hidden">
                     {/* LEFT CONTENT */}
                     <div className="w-full lg:w-[40%] text-center lg:text-left">
                       <div className="flex gap-6 items-center justify-center lg:justify-start mb-4">
@@ -128,7 +127,7 @@ const Banner = () => {
                         </p>
                       </div>
 
-                      <h2 className="font-inter font-semibold text-[32px] lg:text-[38px] xl:text-[48px] leading-10 lg:leading-[60px] pb-[22px] text-[#fafafa] tracking-[0.04em] lg:pe-12">
+                      <h2 className="font-inter font-semibold text-[32px] lg:text-[38px] xl:text-[48px] leading-10 lg:leading-15 pb-5.5 text-[#fafafa] tracking-[0.04em] lg:pe-12">
                         {item.voucher}
                       </h2>
 
@@ -148,7 +147,7 @@ const Banner = () => {
                       <img
                         src={item.img}
                         alt="banner"
-                        className="w-[260px] sm:w-[320px] lg:w-[396px] h-auto lg:h-[352px] object-contain"
+                        className="w-65 sm:w-[320px] lg:w-99 h-auto lg:h-88 object-contain"
                       />
                     </div>
                   </div>

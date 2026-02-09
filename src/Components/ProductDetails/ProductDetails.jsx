@@ -142,7 +142,7 @@ const ProductDetails = () => {
     ].filter(Boolean);
 
   return (
-    <section className="pb-[140px]">
+    <section className="pb-35">
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <nav className="text-sm text-gray-500 py-10 sm:py-20 flex flex-wrap gap-2">
           <Link to="/" className="hover:text-black transition">
@@ -156,7 +156,7 @@ const ProductDetails = () => {
           <span className="text-black font-medium">{product.title}</span>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-[70px]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-17.5">
           {/* Left Column: Images */}
           <div className="lg:col-span-7 flex flex-col sm:flex-row gap-6">
             <div className="flex flex-row sm:flex-col gap-4 w-full sm:w-auto">
@@ -187,7 +187,7 @@ const ProductDetails = () => {
               <img
                 src={mainImageSrc}
                 alt={product.title}
-                className="max-w-full max-h-[400px] sm:max-h-[500px] object-contain"
+                className="max-w-full max-h-100 sm:max-h-125 object-contain"
                 onError={e => {
                   e.target.src =
                     'https://via.placeholder.com/600x600?text=No+Image';
@@ -300,7 +300,7 @@ const ProductDetails = () => {
                 >
                   <FiMinus className="w-4 sm:w-5 h-4 sm:h-5" />
                 </button>
-                <span className="px-4 sm:px-[34px] py-1 text-sm sm:text-lg font-poppins border-t border-b border-black/50 font-medium">
+                <span className="px-4 sm:px-8.5 py-1 text-sm sm:text-lg font-poppins border-t border-b border-black/50 font-medium">
                   {quantity}
                 </span>
                 <button
@@ -338,7 +338,7 @@ const ProductDetails = () => {
                   <p className="font-medium text-black font-poppins text-sm sm:text-base leading-6">
                     Free Delivery
                   </p>
-                  <p className="font-medium text-black font-poppins text-xs sm:text-xs leading-[21px]">
+                  <p className="font-medium text-black font-poppins text-xs sm:text-xs leading-5.25">
                     Enter your postal code for Delivery Availability
                   </p>
                 </div>
@@ -349,7 +349,7 @@ const ProductDetails = () => {
                   <p className="font-medium text-black font-poppins text-sm sm:text-base leading-6">
                     Return Delivery
                   </p>
-                  <p className="font-medium text-black font-poppins text-xs sm:text-xs leading-[21px] pt-1 sm:pt-2">
+                  <p className="font-medium text-black font-poppins text-xs sm:text-xs leading-5.25 pt-1 sm:pt-2">
                     Free 30 Days Delivery Returns. Details
                   </p>
                 </div>
@@ -359,14 +359,14 @@ const ProductDetails = () => {
         </div>
 
         {/* Related Products */}
-        <div className="pt-16 sm:pt-[150px] pb-10 sm:pb-[70px]">
+        <div className="pt-16 sm:pt-37.5 pb-10 sm:pb-17.5">
           <div className="relative after:absolute after:content-[''] after:w-5 after:h-full after:bg-[#DB4444] after:left-0 after:top-0 after:rounded-sm pl-7 sm:pl-9">
             <h4 className="text-lg sm:text-xl font-normal font-poppins leading-8 sm:leading-10 text-[#db4444]">
               Related Items
             </h4>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-[30px] mt-4 sm:mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-7.5 mt-4 sm:mt-8">
             {relatedProducts.slice(0, 4).map(item => {
               const isRelatedInCart = cart.some(c => c.id === item.id);
               const isRelatedInWishlist = wishlist.some(w => w.id === item.id);
@@ -445,7 +445,7 @@ const ProductDetails = () => {
 
                     <button
                       onClick={handleRelatedAddToCart}
-                      className="absolute left-0 bottom-[-35px] sm:bottom-0 w-full bg-black text-white text-center py-1 sm:py-2 cursor-pointer opacity-0 group-hover:bottom-0 group-hover:opacity-100 transition-all rounded-b-sm"
+                      className="absolute left-0 -bottom-8.75 sm:bottom-0 w-full bg-black text-white text-center py-1 sm:py-2 cursor-pointer opacity-0 group-hover:bottom-0 group-hover:opacity-100 transition-all rounded-b-sm"
                     >
                       Add To Cart
                     </button>

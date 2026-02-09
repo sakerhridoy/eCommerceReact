@@ -100,17 +100,17 @@ const MyAccount = () => {
   };
 
   return (
-    <section className="pb-[140px]">
+    <section className="pb-35">
       <div className="container px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb + Welcome */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-10 md:py-20 gap-4">
-          <p className="font-poppins font-normal leading-[21px] text-sm text-black/50">
+          <p className="font-poppins font-normal leading-5.25 text-sm text-black/50">
             <Link to="/" className="hover:text-[#DB4444] transition-colors">
               Home
             </Link>
             / <span className="text-black">My Account</span>
           </p>
-          <p className="font-poppins font-normal leading-[21px] text-sm text-black">
+          <p className="font-poppins font-normal leading-5.25 text-sm text-black">
             Welcome!
             <span className="text-[#DB4444]">
               {user?.displayName || 'User'}
@@ -126,7 +126,7 @@ const MyAccount = () => {
                 <h4 className="font-medium font-poppins text-base leading-6 mb-4">
                   Manage My Account
                 </h4>
-                <div className="space-y-2 text-black/50 flex flex-col ps-[35px]">
+                <div className="space-y-2 text-black/50 flex flex-col ps-8.75">
                   <a className="hover:text-[#DB4444] font-poppins font-normal text-base leading-6">
                     My Profile
                   </a>
@@ -142,7 +142,7 @@ const MyAccount = () => {
                 <h4 className="font-medium font-poppins text-base leading-6 mb-4">
                   My Orders
                 </h4>
-                <div className="space-y-2 text-black/50 flex flex-col ps-[35px]">
+                <div className="space-y-2 text-black/50 flex flex-col ps-8.75">
                   <a className="hover:text-[#DB4444] font-poppins font-normal text-base leading-6">
                     My Returns
                   </a>

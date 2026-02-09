@@ -5,7 +5,7 @@ const NotFound = () => {
   return (
     <section className="min-h-screen bg-white">
       <div className="container">
-        <div className="pt-20 pb-[140px]">
+        <div className="pt-20 pb-35">
           <p className="font-poppins font-normal text-sm text-black/50">
             <Link to="/">
               <span> Home /</span>
@@ -14,7 +14,7 @@ const NotFound = () => {
           </p>
         </div>
         <div className="text-center">
-          <h1 className="font-inter leading-[115px] text-[110px] font-medium mb-10">
+          <h1 className="font-inter leading-28.75 text-[110px] font-medium mb-10">
             404 Not Found
           </h1>
 
@@ -22,7 +22,7 @@ const NotFound = () => {
             Your visited page not found. You may go home page.
           </p>
         </div>
-        <div className="pt-24 text-center pb-[156px]">
+        <div className="pt-24 text-center pb-39">
           <Link
             to="/"
             className="font-poppins font-normal text-base inline-block bg-[#DB4444] hover:bg-red-600 text-[#fafafa] px-12 py-4 rounded-sm transition"

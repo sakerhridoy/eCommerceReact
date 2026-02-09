@@ -61,7 +61,7 @@ const TrackOrder = () => {
   };
 
   return (
-    <section className="pb-[140px] bg-gray-50 min-h-screen">
+    <section className="pb-35 bg-gray-50 min-h-screen">
       <div className="container mx-auto px-4">
         {/* Breadcrumb */}
         <div className="py-20">
@@ -147,7 +147,7 @@ const TrackOrder = () => {
               <div className="space-y-6">
                 {result.history.map((step, index) => (
                   <div key={index} className="flex gap-4">
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                       <div className="w-10 h-10 rounded-full bg-[#DB4444]/10 flex items-center justify-center">
                         <span className="text-[#DB4444] text-xl">✓</span>
                       </div>

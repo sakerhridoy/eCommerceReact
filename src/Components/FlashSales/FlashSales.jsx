@@ -88,20 +88,20 @@ const FlashSales = () => {
     <section className="pt-10 lg:pt-24 mx-4 xl:mx-0">
       <div className="container">
         {/* ================= HEADER ================= */}
-        <div className="section-title mb-[31px]">
-          <div className="mb-[13px] relative after:absolute after:w-5 after:h-full after:bg-[#DB4444] after:left-0 after:top-0 after:rounded-sm ps-9">
+        <div className="section-title mb-7.75">
+          <div className="mb-3.25 relative after:absolute after:w-5 after:h-full after:bg-[#DB4444] after:left-0 after:top-0 after:rounded-sm ps-9">
             <h4 className="font-poppins font-semibold text-base text-[#DB4444] leading-10">
               Today’s
             </h4>
           </div>
 
           <div className="flex justify-between items-center">
-            <div className="flex sm:gap-[25px] lg:gap-[87px] items-center">
+            <div className="flex sm:gap-6.25 lg:gap-21.75 items-center">
               <h2 className="font-inter font-semibold text-2xl sm:text-3xl md:text-4xl text-black">
                 Flash Sales
               </h2>
 
-              <div className="flex gap-[17px] items-center">
+              <div className="flex gap-4.25 items-center">
                 {[
                   { label: 'Days', value: days },
                   { label: 'Hours', value: hours },
@@ -169,11 +169,11 @@ const FlashSales = () => {
             return (
               <SwiperSlide key={item.id}>
                 <div className="group">
-                  <div className="bg-[#F5F5F5] py-[35px] relative overflow-hidden">
+                  <div className="bg-[#F5F5F5] py-8.75 relative overflow-hidden">
                     <Link to={`/product/${item.id}`}>
                       <img
                         src={item.img}
-                        className="mx-auto w-[172px] group-hover:scale-90 duration-300"
+                        className="mx-auto w-43 group-hover:scale-90 duration-300"
                       />
                     </Link>
 
@@ -188,7 +188,7 @@ const FlashSales = () => {
                             ? removeFromWishlist(item.id)
                             : addToWishlist(item)
                         }
-                        className="bg-white p-[5px] rounded-full mb-2"
+                        className="bg-white p-1.25 rounded-full mb-2"
                       >
                         <FaRegHeart
                           className={`${
@@ -198,7 +198,7 @@ const FlashSales = () => {
                       </button>
                       <Link
                         to={`/product/${item.id}`}
-                        className="bg-white p-[5px] rounded-full flex justify-center"
+                        className="bg-white p-1.25 rounded-full flex justify-center"
                       >
                         <IoEyeOutline />
                       </Link>

@@ -102,7 +102,7 @@ const Navbar = () => {
   return (
     <nav className="border-b border-gray-200/70 bg-white sticky top-0 z-50">
       <div className="bg-black py-2.5 text-white text-[10px] sm:text-sm px-4 lg:px-0">
-        <div className="container flex justify-end-safe gap-20 lg:gap-[270px] items-center">
+        <div className="container flex justify-end-safe gap-20 lg:gap-67.5 items-center">
           <p className="">
             <span className='hidden md:inline-block'>Summer Sale For All Swim Suits And</span> Free ExpressDelivery - OFF 50%!
             <Link to="/shop" className="underline ps-2 sm:ps-4">
@@ -198,7 +198,7 @@ const Navbar = () => {
           <div className="flex items-center gap-4 lg:gap-4 xl:gap-6">
             <form
               onSubmit={handleSearchSubmit}
-              className="relative hidden sm:block min-w-[220px] md:min-w-[320px]"
+              className="relative hidden sm:block min-w-55 md:min-w-[320px]"
             >
               <div className="bg-[#F5F5F5] rounded-sm flex items-center py-2.5 px-4">
                 <input
@@ -280,9 +280,9 @@ const Navbar = () => {
                     <LuUser />
                   </div>
                   <div
-                    className={`absolute right-0 top-12 w-[225px] bg-[#7D6C8C]/60 backdrop-blur-md rounded-sm shadow-lg px-5 py-4 z-50 transition-all duration-300 ${showAcc ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'}`}
+                    className={`absolute right-0 top-12 w-56.25 bg-[#7D6C8C]/60 backdrop-blur-md rounded-sm shadow-lg px-5 py-4 z-50 transition-all duration-300 ${showAcc ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'}`}
                   >
-                    <ul className="font-poppins font-normal text-[14px] leading-[21px] text-[#FAFAFA] space-y-[18px]">
+                    <ul className="font-poppins font-normal text-[14px] leading-5.25 text-[#FAFAFA] space-y-4.5">
                       {user ? (
                         <>
                           <li>

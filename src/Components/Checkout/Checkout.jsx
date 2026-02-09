@@ -119,7 +119,7 @@ const Checkout = () => {
   };
 
   return (
-    <section className="pb-[140px] px-4 xl:px-0">
+    <section className="pb-35 px-4 xl:px-0">
       <div className="container mx-auto">
         <div className="font-poppins font-normal text-sm text-black/50 py-8">
           Account / My Account / Product / View Cart /{' '}
@@ -130,7 +130,7 @@ const Checkout = () => {
           Billing Details
         </h2>
 
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-[173px]">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-43.25">
           {/* Left Column: Billing Form */}
           <form className="flex-1 space-y-4" onSubmit={handlePlaceOrder}>
             {[

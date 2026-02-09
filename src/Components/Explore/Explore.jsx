@@ -135,11 +135,11 @@ const Explore = () => {
   ];
 
   return (
-    <section className="pb-[168px] mx-4 xl:mx-0">
+    <section className="pb-42 mx-4 xl:mx-0">
       <div className="container">
         {/* HEADER */}
-        <div className="section-title mb-[60px] pt-20">
-          <div className="mb-[13px] relative after:absolute after:w-5 after:h-full after:bg-[#DB4444] after:left-0 after:top-0 after:rounded-sm ps-9">
+        <div className="section-title mb-15 pt-20">
+          <div className="mb-3.25 relative after:absolute after:w-5 after:h-full after:bg-[#DB4444] after:left-0 after:top-0 after:rounded-sm ps-9">
             <h4 className="font-poppins font-semibold text-base text-[#DB4444] leading-10">
               Our Products
             </h4>
@@ -204,12 +204,12 @@ const Explore = () => {
             return (
               <SwiperSlide key={item.id}>
                 <div className="group">
-                  <div className="bg-[#F5F5F5] py-[35px] rounded-sm relative overflow-hidden">
+                  <div className="bg-[#F5F5F5] py-8.75 rounded-sm relative overflow-hidden">
                     <Link to={`/product/${item.id}`}>
                       <img
                         src={item.img}
                         alt={item.title}
-                        className="mx-auto w-[172px] duration-300 group-hover:scale-90"
+                        className="mx-auto w-43 duration-300 group-hover:scale-90"
                       />
                     </Link>
 
@@ -220,7 +220,7 @@ const Explore = () => {
                             ? removeFromWishlist(item.id)
                             : addToWishlist(item)
                         }
-                        className="bg-white p-[5px] rounded-full"
+                        className="bg-white p-1.25 rounded-full"
                       >
                         <FaRegHeart
                           className={isWished ? 'text-red-500' : 'text-black'}
@@ -229,7 +229,7 @@ const Explore = () => {
 
                       <Link
                         to={`/product/${item.id}`}
-                        className="bg-white p-[5px] rounded-full flex justify-center"
+                        className="bg-white p-1.25 rounded-full flex justify-center"
                       >
                         <IoEyeOutline />
                       </Link>
@@ -237,7 +237,7 @@ const Explore = () => {
 
                     <div
                       onClick={() => addToCart(item)}
-                      className="absolute left-0 bottom-[-45px] w-full bg-black text-white text-center py-2
+                      className="absolute left-0 -bottom-11.25 w-full bg-black text-white text-center py-2
                       cursor-pointer opacity-0 group-hover:bottom-0 group-hover:opacity-100 transition-all"
                     >
                       Add To Cart

@@ -70,8 +70,8 @@ const BestSelling = () => {
     <section className='mx-4 xl:mx-0'>
       <div className="container">
         <div className="section-title border-t border-[rgba(0,0,0,0.3)]">
-          <div className="mb-[31px] pt-20">
-            <div className="mb-[13px] relative after:absolute after:w-5 after:h-full after:bg-[#DB4444] after:left-0 after:top-0 after:rounded-sm ps-9">
+          <div className="mb-7.75 pt-20">
+            <div className="mb-3.25 relative after:absolute after:w-5 after:h-full after:bg-[#DB4444] after:left-0 after:top-0 after:rounded-sm ps-9">
               <h4 className="font-poppins font-semibold text-base text-[#DB4444] leading-10">
                 This Month
               </h4>
@@ -94,7 +94,7 @@ const BestSelling = () => {
         </div>
 
         {/* RESPONSIVE GRID */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[30px] pb-20 lg:pb-[140px]">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7.5 pb-20 lg:pb-35">
           {bestSellingItems.map(item => {
             const isWished = wishlist.some(w => w.id === item.id);
 
@@ -104,15 +104,15 @@ const BestSelling = () => {
 
             return (
               <div key={item.id} className="item">
-                <div className="bg-[#F5F5F5] py-[35px] rounded-sm relative">
+                <div className="bg-[#F5F5F5] py-8.75 rounded-sm relative">
                   <Link to={`/product/${item.id}`}>
-                    <img className="mx-auto w-[172px]" src={item.img} alt="" />
+                    <img className="mx-auto w-43" src={item.img} alt="" />
                   </Link>
 
                   <div className="absolute top-3 right-3 px-3">
                     <button
                       onClick={handleToggleWishlist}
-                      className="bg-white p-[5px] rounded-full cursor-pointer mb-2"
+                      className="bg-white p-1.25 rounded-full cursor-pointer mb-2"
                     >
                       <FaRegHeart
                         className={`text-base ${
@@ -123,7 +123,7 @@ const BestSelling = () => {
 
                     <Link
                       to={`/product/${item.id}`}
-                      className="bg-white p-[5px] rounded-full flex items-center justify-center"
+                      className="bg-white p-1.25 rounded-full flex items-center justify-center"
                     >
                       <IoEyeOutline className="text-base text-black" />
                     </Link>
@@ -155,7 +155,7 @@ const BestSelling = () => {
             );
           })}
         </div>
-        <div className='block lg:hidden pb-[60px]'>
+        <div className='block lg:hidden pb-15'>
           <Link
             to="/shop"
             className="bg-[#DB4444] hover:bg-[#b80808] transition-all duration-300 text-center py-4 px-12 rounded-sm font-poppins font-medium text-base text-[#fafafa] w-max"

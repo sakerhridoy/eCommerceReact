@@ -15,10 +15,10 @@ const Footer = () => {
       <footer className="bg-black">
         <div className="mx-4 xl:mx-0">
           <div className="container">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 md:gap-10 lg:gap-4 pt-20 pb-[60px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 md:gap-10 lg:gap-4 pt-20 pb-15">
               {/* LOGO + SUBSCRIBE */}
               <div className="w-full sm:w-[65%] xl:w-[90%] pb-4">
-                <img src={footerLogo} alt="" className="w-[118px]" />
+                <img src={footerLogo} alt="" className="w-29.5" />
                 <div className="py-6">
                   <h5 className="font-poppins font-medium leading-7 text-xl text-[#fafafa] py-6">
                     Subscribe
@@ -34,7 +34,7 @@ const Footer = () => {
                         className="py-3 ps-4 w-full border border-[#fafafa] rounded-sm text-[#fafafa]"
                       />
                     </div>
-                    <div className="absolute right-3 top-[29px]">
+                    <div className="absolute right-3 top-7.25">
                       <GoPaperAirplane className="text-2xl text-[#fafafa]" />
                     </div>
                   </form>

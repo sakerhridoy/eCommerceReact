@@ -8,12 +8,12 @@ const CategoryBanner = () => {
   const { seconds, minutes, hours, days } = useCountdown();
   return (
     <>
-      <section className="pb-[70px] hidden md:block">
+      <section className="pb-17.5 hidden md:block">
         <div className="container">
-          <div className="pt-[69px] ">
+          <div className="pt-17.25 ">
             <div className="slider-container">
               <div className="item">
-                <div className="categoryBanner flex gap-[27px] justify-center items-center ps-16 pt-[69px] overflow-hidden">
+                <div className="categoryBanner flex gap-6.75 justify-center items-center ps-16 pt-17.25 overflow-hidden">
                   <div className="w-[40%]">
                     <div className="">
                       <div className="pb-8">
@@ -26,40 +26,40 @@ const CategoryBanner = () => {
                       </h2>
                       {/* timer component start */}
                       <div className="flex gap-6 items-center pb-11">
-                        <div className="w-[62px] h-[62px] bg-white rounded-[50%] text-center py-auto px-auto flex flex-col justify-center items-center">
+                        <div className="w-15.5 h-15.5 bg-white rounded-[50%] text-center py-auto px-auto flex flex-col justify-center items-center">
                           <h3 className="font-poppins font-semibold text-base leading-5 text-black">
                             {days >= 10 ? days : `0${days}`}
                           </h3>
-                          <h4 className="font-poppins font-normal text-[11px] text-black leading-[18px] pb-1">
+                          <h4 className="font-poppins font-normal text-[11px] text-black leading-4.5 pb-1">
                             Days
                           </h4>
                         </div>
-                        <div className="w-[62px] h-[62px] bg-white rounded-[50%] text-center py-auto px-auto flex flex-col justify-center items-center">
+                        <div className="w-15.5 h-15.5 bg-white rounded-[50%] text-center py-auto px-auto flex flex-col justify-center items-center">
                           <h3 className="font-poppins font-semibold text-base leading-5 text-black">
                             {hours >= 10 ? hours : `0${hours}`}
                           </h3>
-                          <h4 className="font-poppins font-normal text-[11px] text-black leading-[18px] pb-1">
+                          <h4 className="font-poppins font-normal text-[11px] text-black leading-4.5 pb-1">
                             Hours
                           </h4>
                         </div>
-                        <div className="w-[62px] h-[62px] bg-white rounded-[50%] text-center py-auto px-auto flex flex-col justify-center items-center">
+                        <div className="w-15.5 h-15.5 bg-white rounded-[50%] text-center py-auto px-auto flex flex-col justify-center items-center">
                           <h3 className="font-poppins font-semibold text-base leading-5 text-black">
                             {minutes >= 10 ? minutes : `0${minutes}`}
                           </h3>
-                          <h4 className="font-poppins font-normal text-[11px] text-black leading-[18px] pb-1">
+                          <h4 className="font-poppins font-normal text-[11px] text-black leading-4.5 pb-1">
                             Minutes
                           </h4>
                         </div>
-                        <div className="w-[62px] h-[62px] bg-white rounded-[50%] text-center py-auto px-auto flex flex-col justify-center items-center">
+                        <div className="w-15.5 h-15.5 bg-white rounded-[50%] text-center py-auto px-auto flex flex-col justify-center items-center">
                           <h3 className="font-poppins font-semibold text-base leading-5 text-black">
                             {seconds >= 10 ? seconds : `0${seconds}`}
                           </h3>
-                          <h4 className="font-poppins font-normal text-[11px] text-black leading-[18px] pb-1">
+                          <h4 className="font-poppins font-normal text-[11px] text-black leading-4.5 pb-1">
                             Seconds
                           </h4>
                         </div>
                       </div>
-                      <div className="flex gap-2 items-center mb-[65px]">
+                      <div className="flex gap-2 items-center mb-16.25">
                         <Link
                           to='/checkout'
                           className="bg-[#00FF66] hover:bg-[#00ff66de] duration-300 hover:text-white text-center py-4 px-12 rounded-sm font-poppins font-medium text-base text-[#fafafa] leading-6"

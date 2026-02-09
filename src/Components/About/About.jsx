@@ -14,33 +14,32 @@ import { Autoplay, Pagination } from 'swiper/modules';
 import aboutImg from '../../assets/images/about.png';
 import team1 from '../../assets/images/team1.png';
 import team2 from '../../assets/images/team2.png';
-import team3 from '../../assets/images/team3.png';
 import Services from '../Services/Services';
 
 
 const About = () => {
   return (
-    <section className="pb-[140px] px-4 xl:px-0">
+    <section className="pb-35 px-4 xl:px-0">
       <div className="container">
         {/* BREADCRUMB */}
-        <p className="text-sm text-black/50 py-10 lg:py-20 font-poppins font-normal leading-[21px]">
+        <p className="text-sm text-black/50 py-10 lg:py-20 font-poppins font-normal leading-5.25">
           <Link to="/">Home</Link> / <span className="text-black">About</span>
         </p>
 
         {/* ================= OUR STORY ================= */}
-        <div className="relative grid lg:grid-cols-2 gap-20 items-center lg:pb-[140px] lg:pt-[137px]">
+        <div className="relative grid lg:grid-cols-2 gap-20 items-center lg:pb-35 lg:pt-34.25">
           <div>
             <h2 className="font-inter font-semibold text-[54px] leading-16 pb-10 text-black">
               Our Story
             </h2>
-            <p className="text-black font-poppins font-normal text-base leading-[26px] pr-4 mb-6">
+            <p className="text-black font-poppins font-normal text-base leading-6.5 pr-4 mb-6">
               Launched in 2015, Exclusive is South Asia’s premier online
               shopping marketplace with an active presence in Bangladesh.
               Supported by a wide range of tailored marketing, data and service
               solutions, Exclusive has 10,500 sellers and 300 brands and serves
               3 million customers across the region.
             </p>
-            <p className="text-black font-poppins font-normal text-base leading-[26px] pr-4">
+            <p className="text-black font-poppins font-normal text-base leading-6.5 pr-4">
               Exclusive has more than 1 Million products to offer, growing at a
               very fast pace. Exclusive offers a diverse assortment in
               categories ranging from consumer.
@@ -48,7 +47,7 @@ const About = () => {
           </div>
           <div></div>
         </div>
-        <div className="absolute right-0 top-[340px] w-[50%] h-[609px] hidden lg:block">
+        <div className="absolute right-0 top-85 w-[50%] h-152.25 hidden lg:block">
           <img
             src={aboutImg}
             alt="Our Story"
@@ -85,14 +84,14 @@ const About = () => {
           ].map((item, i) => (
             <div
               key={i}
-              className={`border rounded-sm py-[30px] flex flex-col items-center gap-3 group ${
+              className={`border rounded-sm py-7.5 flex flex-col items-center gap-3 group ${
                 item.active
                   ? 'bg-[#DB4444] text-white border-[#DB4444]'
                   : 'border-black/30 hover:bg-[#DB4444] hover:text-white transition hover:border-[#DB4444]'
               }`}
             >
               <div
-                className={`w-[58px] h-[58px] rounded-full border-10  flex items-center justify-center text-3xl group-hover:border-[rgba(47,46,48,0.1)] group-hover:bg-white group-hover:text-black transition duration-300 ${
+                className={`w-14.5 h-14.5 rounded-full border-10  flex items-center justify-center text-3xl group-hover:border-[rgba(47,46,48,0.1)] group-hover:bg-white group-hover:text-black transition duration-300 ${
                   item.active
                     ? 'bg-white text-black border-[rgba(47,46,48,0.1)]'
                     : 'bg-black text-white border-[rgba(255,255,255,0.6)]'
@@ -100,7 +99,7 @@ const About = () => {
               >
                 {item.icon}
               </div>
-              <h3 className="text-[32px] font-inter leading-[30px] tracking-[4%] font-bold pt-6">
+              <h3 className="text-[32px] font-inter leading-7.5 tracking-[4%] font-bold pt-6">
                 {item.value}
               </h3>
               <p className="text-base md:text-xs lg:text-base font-poppins font-normal leading-6 pt-3">
@@ -111,7 +110,7 @@ const About = () => {
         </div>
 
         {/* ================= TEAM ================= */}
-        <div className="my-[140px]">
+        <div className="my-35">
           <Swiper
             modules={[Autoplay, Pagination]}
             spaceBetween={30}
@@ -143,7 +142,7 @@ const About = () => {
             ].map((member, i) => (
               <SwiperSlide key={i}>
                 <div>
-                  <div className="bg-[#F5F5F5] rounded-sm pt-[38px] px-[22px]">
+                  <div className="bg-[#F5F5F5] rounded-sm pt-9.5 px-5.5">
                     <img
                       src={member.img}
                       alt={member.name}

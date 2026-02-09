@@ -99,11 +99,11 @@ const Contact = () => {
   };
 
   return (
-    <section className="pb-[100px] md:pb-[140px]">
+    <section className="pb-25 md:pb-35">
       <div className="container mx-auto px-4">
         {/* Breadcrumb */}
         <div className="py-10 md:py-20">
-          <p className="text-sm text-black/50 font-poppins font-normal leading-[21px]">
+          <p className="text-sm text-black/50 font-poppins font-normal leading-5.25">
             <Link to="/">Home</Link> /{' '}
             <span className="text-black">Contact</span>
           </p>
@@ -111,7 +111,7 @@ const Contact = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* ================= LEFT INFO ================= */}
-          <div className="rounded-sm px-5 sm:px-[35px] pt-10 pb-[50px] shadow-sm">
+          <div className="rounded-sm px-5 sm:px-8.75 pt-10 pb-12.5 shadow-sm">
             {/* Call */}
             <div>
               <div className="flex items-center gap-4 mb-6">
@@ -122,10 +122,10 @@ const Contact = () => {
                   Call To Us
                 </h4>
               </div>
-              <p className="text-sm font-poppins font-normal leading-[21px] text-black mb-4">
+              <p className="text-sm font-poppins font-normal leading-5.25 text-black mb-4">
                 We are available 24/7, 7 days a week.
               </p>
-              <p className="text-sm font-poppins font-normal leading-[21px] text-black pb-8">
+              <p className="text-sm font-poppins font-normal leading-5.25 text-black pb-8">
                 Phone: +880161112222
               </p>
             </div>
@@ -142,13 +142,13 @@ const Contact = () => {
                   Write To Us
                 </h4>
               </div>
-              <p className="text-sm font-poppins font-normal leading-[21px] text-black mb-4 pr-5">
+              <p className="text-sm font-poppins font-normal leading-5.25 text-black mb-4 pr-5">
                 Fill out our form and we will contact you within 24 hours.
               </p>
-              <p className="text-sm font-poppins font-normal leading-[21px] text-black mb-4">
+              <p className="text-sm font-poppins font-normal leading-5.25 text-black mb-4">
                 Emails: customer@exclusive.com
               </p>
-              <p className="text-sm font-poppins font-normal leading-[21px] text-black">
+              <p className="text-sm font-poppins font-normal leading-5.25 text-black">
                 Emails: support@exclusive.com
               </p>
             </div>
@@ -182,7 +182,7 @@ const Contact = () => {
                     required
                     className="w-full bg-[#F5F5F5] p-3 outline-none font-poppins font-normal text-base leading-6 text-black/50"
                   />
-                  <span className="absolute left-[110px] top-1/2 -translate-y-1/2 text-[rgba(219,68,68,0.5)] font-semibold">
+                  <span className="absolute left-27.5 top-1/2 -translate-y-1/2 text-[rgba(219,68,68,0.5)] font-semibold">
                     *
                   </span>
                 </div>
@@ -199,7 +199,7 @@ const Contact = () => {
                     required
                     className="w-full bg-[#F5F5F5] p-3 outline-none font-poppins font-normal text-base leading-6 text-black/50"
                   />
-                  <span className="absolute left-[110px] top-5 -translate-y-1/2 text-[rgba(219,68,68,0.5)] font-semibold">
+                  <span className="absolute left-27.5 top-5 -translate-y-1/2 text-[rgba(219,68,68,0.5)] font-semibold">
                     *
                   </span>
                   {errors.email && (
@@ -221,7 +221,7 @@ const Contact = () => {
                     required
                     className="w-full bg-[#F5F5F5] p-3 outline-none font-poppins font-normal text-base leading-6 text-black/50"
                   />
-                  <span className="absolute left-[110px] top-5 -translate-y-1/2 text-[rgba(219,68,68,0.5)] font-semibold">
+                  <span className="absolute left-27.5 top-5 -translate-y-1/2 text-[rgba(219,68,68,0.5)] font-semibold">
                     *
                   </span>
                   {errors.phone && (
@@ -244,7 +244,7 @@ const Contact = () => {
                   required
                   className="w-full bg-[#F5F5F5] p-3 outline-none font-poppins font-normal text-base leading-6 text-black/50 rounded-sm resize-none"
                 ></textarea>
-                <span className="absolute left-[130px] top-2.5 text-[rgba(219,68,68,0.5)] font-semibold">
+                <span className="absolute left-32.5 top-2.5 text-[rgba(219,68,68,0.5)] font-semibold">
                   *
                 </span>
                 {errors.message && (

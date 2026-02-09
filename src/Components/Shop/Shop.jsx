@@ -238,7 +238,7 @@ const Shop = () => {
                         {/* ADD TO CART */}
                         <div
                           onClick={handleAddToCart}
-                          className="absolute left-0 bottom-[-45px] w-full bg-black text-white text-center py-2 cursor-pointer opacity-0 group-hover:bottom-0 group-hover:opacity-100 transition-all"
+                          className="absolute left-0 -bottom-11.25 w-full bg-black text-white text-center py-2 cursor-pointer opacity-0 group-hover:bottom-0 group-hover:opacity-100 transition-all"
                         >
                           Add To Cart
                         </div>

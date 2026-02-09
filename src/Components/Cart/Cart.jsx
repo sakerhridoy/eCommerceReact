@@ -23,7 +23,7 @@ const Cart = () => {
   const total = subtotal + shippingCost;
 
   return (
-    <section className="pb-[140px] pt-10">
+    <section className="pb-35 pt-10">
       <div className="container px-4 xl:px-0">
         {/* Breadcrumb */}
         <div className="py-10">

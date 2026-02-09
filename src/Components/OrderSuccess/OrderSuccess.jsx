@@ -9,7 +9,7 @@ const OrderSuccess = () => {
   const total = location.state?.total || '0.00';
 
   return (
-    <section className="pb-[140px] bg-gray-50 min-h-screen">
+    <section className="pb-35 bg-gray-50 min-h-screen">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="font-poppins font-normal text-sm text-black/50 py-20">

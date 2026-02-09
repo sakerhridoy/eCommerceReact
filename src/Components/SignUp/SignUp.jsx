@@ -67,7 +67,7 @@ const SignUp = () => {
   };
 
   return (
-    <section className="relative pt-10 md:pt-[76px] pb-[100px] md:pb-[140px] px-4 lg:px-0">
+    <section className="relative pt-10 md:pt-19 pb-25 md:pb-35 px-4 lg:px-0">
       {/* IMAGE (DESKTOP ONLY) */}
       <div className="hidden lg:flex w-1/2">
         <img
