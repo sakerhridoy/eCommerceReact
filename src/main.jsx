@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
 
-import CountdownContextProvider from './context/CountDownContext/CountDownContext.js';
+import  CountdownContextProvider from './context/Provider/CountDownContextProvider.jsx';
 import { ShopProvider } from './context/ShopContext/ShopContext.jsx';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
