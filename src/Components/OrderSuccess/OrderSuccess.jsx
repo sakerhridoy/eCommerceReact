@@ -2,7 +2,6 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const OrderSuccess = () => {
-  // Optional: You can pass order data via state from Checkout page
   const location = useLocation();
   const orderNumber =
     location.state?.orderNumber ||
@@ -11,7 +10,7 @@ const OrderSuccess = () => {
 
   return (
     <section className="pb-[140px] bg-gray-50 min-h-screen">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="font-poppins font-normal text-sm text-black/50 py-20">
           <Link to="/" className="hover:text-[#DB4444]">
@@ -25,8 +24,8 @@ const OrderSuccess = () => {
           <span className="text-[#DB4444] font-medium">Order Confirmed</span>
         </div>
 
-        <div className="max-w-3xl mx-auto bg-white rounded-sm shadow-sm p-10 md:p-16 text-center">
-          {/* Success Icon / Animation area */}
+        <div className="max-w-3xl mx-auto bg-white rounded-sm shadow-sm p-8 sm:p-10 md:p-16 text-center">
+          {/* Success Icon */}
           <div className="mb-10">
             <div className="w-24 h-24 mx-auto bg-[#DB4444]/10 rounded-full flex items-center justify-center">
               <svg
@@ -46,7 +45,7 @@ const OrderSuccess = () => {
             </div>
           </div>
 
-          <h1 className="font-inter font-medium text-4xl md:text-5xl text-black mb-6 leading-tight">
+          <h1 className="font-inter font-medium text-4xl sm:text-4xl md:text-5xl text-black mb-6 leading-tight">
             Thank You For Your Order!
           </h1>
 
@@ -56,21 +55,21 @@ const OrderSuccess = () => {
           </p>
 
           {/* Order Summary Card */}
-          <div className="bg-[#F5F5F5] rounded-sm p-8 mb-12">
-            <div className="space-y-4 text-left">
-              <div className="flex justify-between font-poppins text-base">
+          <div className="bg-[#F5F5F5] rounded-sm p-6 sm:p-8 mb-12 text-left">
+            <div className="space-y-4">
+              <div className="flex justify-between font-poppins text-base flex-wrap">
                 <span className="text-black/70">Order Number:</span>
                 <span className="font-medium">{orderNumber}</span>
               </div>
-              <div className="flex justify-between font-poppins text-base">
+              <div className="flex justify-between font-poppins text-base flex-wrap">
                 <span className="text-black/70">Order Total:</span>
                 <span className="font-medium">${total}</span>
               </div>
-              <div className="flex justify-between font-poppins text-base">
+              <div className="flex justify-between font-poppins text-base flex-wrap">
                 <span className="text-black/70">Payment Method:</span>
                 <span className="font-medium">Cash on Delivery</span>
               </div>
-              <div className="flex justify-between font-poppins text-base">
+              <div className="flex justify-between font-poppins text-base flex-wrap">
                 <span className="text-black/70">Estimated Delivery:</span>
                 <span className="font-medium">3-5 Business Days</span>
               </div>
@@ -83,17 +82,17 @@ const OrderSuccess = () => {
           </p>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row justify-center gap-6">
+          <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 flex-wrap">
             <Link
               to="/track-order"
-              className="bg-[#DB4444] text-white font-poppins font-medium text-base py-5 px-12 rounded-sm hover:bg-[#c0392b] transition-colors"
+              className="bg-[#DB4444] text-white font-poppins font-medium text-base py-5 px-12 rounded-sm hover:bg-[#c0392b] transition-colors w-full sm:w-auto text-center"
             >
               Track Your Order
             </Link>
 
             <Link
               to="/"
-              className="border border-[#DB4444] text-[#DB4444] font-poppins font-medium text-base py-5 px-12 rounded-sm hover:bg-[#DB4444]/10 transition-colors"
+              className="border border-[#DB4444] text-[#DB4444] font-poppins font-medium text-base py-5 px-12 rounded-sm hover:bg-[#DB4444]/10 transition-colors w-full sm:w-auto text-center"
             >
               Continue Shopping
             </Link>

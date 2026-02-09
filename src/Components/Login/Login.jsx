@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 const Login = () => {
-  const { login, user } = useAuth(); // 🔥 login + user (for name)
+  const { login, user } = useAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({ email: '', password: '' });
@@ -23,11 +23,9 @@ const Login = () => {
     try {
       await login(form.email, form.password);
 
-      // Get user's name dynamically (fallback to "User" if not available)
       const userName =
         user?.displayName || user?.email?.split('@')[0] || 'User';
 
-      // Success popup with dynamic name
       await Swal.fire({
         title: 'Welcome back!',
         text: `Login successful, ${userName}!`,
@@ -38,13 +36,10 @@ const Login = () => {
         timerProgressBar: true,
       });
 
-      // Redirect to home
       navigate('/');
     } catch (err) {
-      console.log(err);
       setError('Invalid email or password');
 
-      // Error popup
       Swal.fire({
         title: 'Login Failed',
         text: err.message || 'Invalid email or password. Please try again.',
@@ -57,17 +52,19 @@ const Login = () => {
   };
 
   return (
-    <section className="relative pt-[76px] pb-[140px]">
-      <div className="hidden w-1/2 md:flex">
+    <section className="relative pt-10 md:pt-[76px] pb-[100px] md:pb-[140px] px-4 lg:px-0">
+      {/* IMAGE – DESKTOP ONLY */}
+      <div className="hidden lg:flex w-1/2">
         <img
           src={signupImg}
-          className="w-full h-full"
+          className="w-full h-full object-cover"
           alt="Login illustration"
         />
       </div>
 
-      <div className="absolute inset-0">
-        <div className="container h-full flex justify-end items-center">
+      {/* FORM */}
+      <div className="lg:absolute lg:inset-0">
+        <div className="container h-full flex md:justify-end items-center">
           <div className="w-full max-w-md">
             <h2 className="text-4xl font-medium font-inter pb-6">
               Log in to Exclusive
@@ -104,11 +101,12 @@ const Login = () => {
                 required
                 disabled={loading}
               />
-              <div className="flex pt-8 gap-24">
+
+              <div className="flex pt-8 gap-20 md:gap-24">
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-full bg-[#DB4444] py-4 text-white font-normal rounded-sm transition ${
+                  className={`w-full bg-[#DB4444] py-3 md:py-4 text-white font-normal rounded-sm transition ${
                     loading
                       ? 'opacity-70 cursor-not-allowed'
                       : 'hover:bg-[#c0392b]'
@@ -116,9 +114,10 @@ const Login = () => {
                 >
                   {loading ? 'Logging in...' : 'Log in'}
                 </button>
+
                 <button
                   type="button"
-                  className={`w-full text-[#DB4444] py-4 font-normal font-poppins`}
+                  className="w-full text-[#DB4444] md:py-4 font-normal font-poppins"
                 >
                   Forget Password?
                 </button>

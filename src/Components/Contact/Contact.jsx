@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // ← react-router-dom import করা উচিত
+import { Link } from 'react-router-dom';
 import { FiPhone, FiMail } from 'react-icons/fi';
 
 const Contact = () => {
@@ -11,7 +11,7 @@ const Contact = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState({ type: '', message: '' }); // success / error
+  const [status, setStatus] = useState({ type: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateField = (name, value) => {
@@ -47,13 +47,11 @@ const Contact = () => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
 
-    // Live validation on change (phone & email)
     if (['phone', 'email'].includes(name)) {
       const err = validateField(name, value);
       setErrors(prev => ({ ...prev, [name]: err }));
     }
 
-    // Clear status when user starts typing again
     if (status.message) setStatus({ type: '', message: '' });
   };
 
@@ -81,10 +79,7 @@ const Contact = () => {
     setIsSubmitting(true);
     setStatus({ type: '', message: '' });
 
-    // Simulate API call (এখানে পরে Firebase / EmailJS / backend call দিবে)
     try {
-      // await sendContactForm(form);  // ← future real API call
-
       await new Promise(resolve => setTimeout(resolve, 1200)); // fake delay
 
       setStatus({
@@ -104,19 +99,19 @@ const Contact = () => {
   };
 
   return (
-    <section className="pb-[140px]">
-      <div className="container">
+    <section className="pb-[100px] md:pb-[140px]">
+      <div className="container mx-auto px-4">
         {/* Breadcrumb */}
-        <div className="py-20">
+        <div className="py-10 md:py-20">
           <p className="text-sm text-black/50 font-poppins font-normal leading-[21px]">
             <Link to="/">Home</Link> /{' '}
             <span className="text-black">Contact</span>
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* ================= LEFT INFO ================= */}
-          <div className="rounded-sm px-[35px] pt-10 pb-[50px] shadow-sm">
+          <div className="rounded-sm px-5 sm:px-[35px] pt-10 pb-[50px] shadow-sm">
             {/* Call */}
             <div>
               <div className="flex items-center gap-4 mb-6">
@@ -160,7 +155,7 @@ const Contact = () => {
           </div>
 
           {/* ================= RIGHT FORM ================= */}
-          <div className="lg:col-span-2 rounded-sm shadow-sm px-8 py-10">
+          <div className="lg:col-span-2 rounded-sm shadow-sm px-5 sm:px-8 py-10">
             {status.message && (
               <div
                 className={`mb-6 p-4 rounded-sm text-center font-poppins text-sm ${
@@ -174,7 +169,7 @@ const Contact = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="relative">
                   <input
                     type="text"
@@ -187,14 +182,9 @@ const Contact = () => {
                     required
                     className="w-full bg-[#F5F5F5] p-3 outline-none font-poppins font-normal text-base leading-6 text-black/50"
                   />
-                  <span className="absolute left-[47%] top-5 -translate-y-1/2 text-[rgba(219,68,68,0.5)] font-semibold">
+                  <span className="absolute left-[110px] top-1/2 -translate-y-1/2 text-[rgba(219,68,68,0.5)] font-semibold">
                     *
                   </span>
-                  {errors.name && (
-                    <p className="text-red-500 text-xs font-poppins font-normal mt-1">
-                      {errors.name}
-                    </p>
-                  )}
                 </div>
 
                 <div className="relative">
@@ -209,7 +199,7 @@ const Contact = () => {
                     required
                     className="w-full bg-[#F5F5F5] p-3 outline-none font-poppins font-normal text-base leading-6 text-black/50"
                   />
-                  <span className="absolute left-[47%] top-5 -translate-y-1/2 text-[rgba(219,68,68,0.5)] font-semibold">
+                  <span className="absolute left-[110px] top-5 -translate-y-1/2 text-[rgba(219,68,68,0.5)] font-semibold">
                     *
                   </span>
                   {errors.email && (
@@ -231,7 +221,7 @@ const Contact = () => {
                     required
                     className="w-full bg-[#F5F5F5] p-3 outline-none font-poppins font-normal text-base leading-6 text-black/50"
                   />
-                  <span className="absolute left-[47%] top-5 -translate-y-1/2 text-[rgba(219,68,68,0.5)] font-semibold">
+                  <span className="absolute left-[110px] top-5 -translate-y-1/2 text-[rgba(219,68,68,0.5)] font-semibold">
                     *
                   </span>
                   {errors.phone && (
@@ -254,7 +244,7 @@ const Contact = () => {
                   required
                   className="w-full bg-[#F5F5F5] p-3 outline-none font-poppins font-normal text-base leading-6 text-black/50 rounded-sm resize-none"
                 ></textarea>
-                <span className="absolute left-[18%] top-2.5 text-[rgba(219,68,68,0.5)] font-semibold">
+                <span className="absolute left-[130px] top-2.5 text-[rgba(219,68,68,0.5)] font-semibold">
                   *
                 </span>
                 {errors.message && (

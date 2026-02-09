@@ -7,8 +7,7 @@ import { useShop } from '../../Context/ShopContext/ShopContext';
 const WishList = () => {
   const { wishlist, addToCart, removeFromWishlist } = useShop();
 
-  const getItemImage = item =>
-    item.img || item.thumbnail || item.image || '';
+  const getItemImage = item => item.img || item.thumbnail || item.image || '';
 
   const getItemName = item => item.name || item.title || 'Product';
 
@@ -25,9 +24,9 @@ const WishList = () => {
   }
 
   return (
-    <section className="pt-[95px] pb-[140px]">
+    <section className="pt-[95px] pb-[140px] mx-4 xl:mx-0">
       <div className="container">
-        <div className="grid grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {wishlist.map(item => (
             <div key={item.id} className="group relative">
               {/* Image Box */}

@@ -37,15 +37,7 @@ const Banner = () => {
       voucher: 'Up to 20% off Voucher',
       btn: 'Shop Now',
       img: iphone16,
-    },
-    {
-      id: 4,
-      logo: apple,
-      series: 'iPhone 17 Series',
-      voucher: 'Up to 10% off Voucher',
-      btn: 'Shop Now',
-      img: iphone17,
-    },
+    }
   ];
 
   /* ================= STATE ================= */

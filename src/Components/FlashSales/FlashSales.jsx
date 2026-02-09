@@ -85,7 +85,7 @@ const FlashSales = () => {
   ];
 
   return (
-    <section className="pt-24 mx-4 xl:mx-0">
+    <section className="pt-10 lg:pt-24 mx-4 xl:mx-0">
       <div className="container">
         {/* ================= HEADER ================= */}
         <div className="section-title mb-[31px]">

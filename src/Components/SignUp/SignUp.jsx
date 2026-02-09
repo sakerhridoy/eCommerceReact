@@ -19,7 +19,7 @@ const SignUp = () => {
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setError(''); // clear error on typing
+    setError('');
   };
 
   const handleSubmit = async e => {
@@ -40,22 +40,19 @@ const SignUp = () => {
     try {
       await signup(form.email, form.password, form.name);
 
-      // Success popup
       await Swal.fire({
         title: 'Success!',
         text: 'Your account has been created successfully.',
         icon: 'success',
         confirmButtonColor: '#DB4444',
         confirmButtonText: 'Go to Login',
-        timer: 2500, // auto close after 2.5s
+        timer: 2500,
         timerProgressBar: true,
         showConfirmButton: true,
       });
 
-      // Redirect to login after popup
       navigate('/login');
     } catch (err) {
-      // Error popup
       Swal.fire({
         title: 'Error',
         text: err.message || 'Failed to create account. Please try again.',
@@ -70,13 +67,19 @@ const SignUp = () => {
   };
 
   return (
-    <section className="relative pt-[76px] pb-[140px]">
-      <div className="hidden w-1/2 md:flex">
-        <img src={signupImg} className="w-full h-full" alt="Signup" />
+    <section className="relative pt-10 md:pt-[76px] pb-[100px] md:pb-[140px] px-4 lg:px-0">
+      {/* IMAGE (DESKTOP ONLY) */}
+      <div className="hidden lg:flex w-1/2">
+        <img
+          src={signupImg}
+          className="w-full h-full object-cover"
+          alt="Signup"
+        />
       </div>
 
-      <div className="absolute inset-0">
-        <div className="container h-full flex justify-end items-center">
+      {/* FORM */}
+      <div className="lg:absolute lg:inset-0 ">
+        <div className="container h-full flex md:justify-end items-center">
           <div className="w-full max-w-md">
             <h2 className="text-4xl font-medium pb-6">Create an account</h2>
             <p className="pb-8">Enter your details below</p>

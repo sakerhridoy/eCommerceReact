@@ -13,11 +13,11 @@ const Footer = () => {
   return (
     <>
       <footer className="bg-black">
-        <div className="mx-4 lg:mx-0">
+        <div className="mx-4 xl:mx-0">
           <div className="container">
-            <div className="flex flex-col flex-wrap lg:flex-nowrap sm:flex-row gap-10  pt-20 pb-[60px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 md:gap-10 lg:gap-4 pt-20 pb-[60px]">
               {/* LOGO + SUBSCRIBE */}
-              <div className="w-full sm:w-1/2 lg:w-[26%]">
+              <div className="w-full sm:w-[65%] xl:w-[90%] pb-4">
                 <img src={footerLogo} alt="" className="w-[118px]" />
                 <div className="py-6">
                   <h5 className="font-poppins font-medium leading-7 text-xl text-[#fafafa] py-6">
@@ -42,7 +42,7 @@ const Footer = () => {
               </div>
 
               {/* SUPPORT */}
-              <div className="w-full sm:w-1/2 lg:w-[20%]">
+              <div className="w-full sm:w-[45%] lg:w-[60%] xl:w-[90%] pb-4">
                 <h5 className="font-poppins font-medium leading-7 text-xl text-[#fafafa] pb-6">
                   Support
                 </h5>
@@ -60,7 +60,7 @@ const Footer = () => {
               </div>
 
               {/* ACCOUNT */}
-              <div className="w-full sm:w-1/2 lg:w-[17%]">
+              <div className="w-full sm:w-1/2 xl:w-[90%] pb-4">
                 <h5 className="font-poppins font-medium leading-7 text-xl text-[#fafafa] pb-6">
                   Account
                 </h5>
@@ -81,7 +81,7 @@ const Footer = () => {
               </div>
 
               {/* QUICK LINK */}
-              <div className="w-full sm:w-1/2 lg:w-[17%]">
+              <div className="w-full sm:w-1/2 pb-4">
                 <h5 className="font-poppins font-medium leading-7 text-xl text-[#fafafa] pb-6">
                   Quick Link
                 </h5>
@@ -102,7 +102,7 @@ const Footer = () => {
               </div>
 
               {/* DOWNLOAD APP */}
-              <div className="w-full sm:w-1/2 lg:w-[20%]">
+              <div className="w-full sm:w-1/2 xl:w-[90%]">
                 <h5 className="font-poppins font-medium leading-7 text-xl text-[#fafafa] pb-6">
                   Download App
                 </h5>

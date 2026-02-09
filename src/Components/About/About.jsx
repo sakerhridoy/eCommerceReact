@@ -20,15 +20,15 @@ import Services from '../Services/Services';
 
 const About = () => {
   return (
-    <section className="pb-[140px]">
+    <section className="pb-[140px] px-4 xl:px-0">
       <div className="container">
         {/* BREADCRUMB */}
-        <p className="text-sm text-black/50 py-20 font-poppins font-normal leading-[21px]">
+        <p className="text-sm text-black/50 py-10 lg:py-20 font-poppins font-normal leading-[21px]">
           <Link to="/">Home</Link> / <span className="text-black">About</span>
         </p>
 
         {/* ================= OUR STORY ================= */}
-        <div className="relative grid grid-cols-2 gap-20 items-center pb-[140px] pt-[137px]">
+        <div className="relative grid lg:grid-cols-2 gap-20 items-center lg:pb-[140px] lg:pt-[137px]">
           <div>
             <h2 className="font-inter font-semibold text-[54px] leading-16 pb-10 text-black">
               Our Story
@@ -48,7 +48,7 @@ const About = () => {
           </div>
           <div></div>
         </div>
-        <div className="absolute right-0 top-[340px] w-[50%] h-[609px]">
+        <div className="absolute right-0 top-[340px] w-[50%] h-[609px] hidden lg:block">
           <img
             src={aboutImg}
             alt="Our Story"
@@ -59,7 +59,7 @@ const About = () => {
 
       <div className="container">
         {/* ================= STATS ================= */}
-        <div className="grid grid-cols-4 gap-8 mt-24">
+        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-2 lg:gap-8 mt-10 md:mt-24">
           {[
             {
               icon: <CiShop />,
@@ -103,7 +103,7 @@ const About = () => {
               <h3 className="text-[32px] font-inter leading-[30px] tracking-[4%] font-bold pt-6">
                 {item.value}
               </h3>
-              <p className="text-base font-poppins font-normal leading-6 pt-3">
+              <p className="text-base md:text-xs lg:text-base font-poppins font-normal leading-6 pt-3">
                 {item.text}
               </p>
             </div>
@@ -114,7 +114,6 @@ const About = () => {
         <div className="my-[140px]">
           <Swiper
             modules={[Autoplay, Pagination]}
-            slidesPerView={3}
             spaceBetween={30}
             loop
             autoplay={{
@@ -124,43 +123,23 @@ const About = () => {
             pagination={{
               clickable: true,
               el: '.team-pagination',
-              renderBullet: (index, className) => {
-                return `<span class="${className} custom-dot"></span>`;
-              },
+              renderBullet: (index, className) =>
+                `<span class="${className} custom-dot"></span>`,
+            }}
+            breakpoints={{
+              0: { slidesPerView: 1 },
+              640: { slidesPerView: 2 },
+              1024: { slidesPerView: 3 },
             }}
             className="pb-16"
           >
             {[
-              {
-                img: team1,
-                name: 'Tom Cruise',
-                role: 'Founder & Chairman',
-              },
-              {
-                img: team2,
-                name: 'Emma Watson',
-                role: 'Managing Director',
-              },
-              {
-                img: team3,
-                name: 'Will Smith',
-                role: 'Product Designer',
-              },
-              {
-                img: team1,
-                name: 'Tom Cruise',
-                role: 'Founder & Chairman',
-              },
-              {
-                img: team2,
-                name: 'Emma Watson',
-                role: 'Managing Director',
-              },
-              {
-                img: team3,
-                name: 'Will Smith',
-                role: 'Product Designer',
-              },
+              { img: team1, name: 'Tom Cruise', role: 'Founder & Chairman' },
+              { img: team2, name: 'Emma Watson', role: 'Managing Director' },
+              { img: team1, name: 'Will Smith', role: 'Product Designer' },
+              { img: team1, name: 'Tom Cruise', role: 'Founder & Chairman' },
+              { img: team2, name: 'Emma Watson', role: 'Managing Director' },
+              { img: team1, name: 'Will Smith', role: 'Product Designer' },
             ].map((member, i) => (
               <SwiperSlide key={i}>
                 <div>
@@ -181,22 +160,15 @@ const About = () => {
                   </p>
 
                   <div className="flex gap-4 mt-4">
-                    <a href="#">
-                      <CiTwitter className="text-2xl" />
-                    </a>
-                    <a href="#">
-                      <FiInstagram className="text-xl" />
-                    </a>
-                    <a href="#">
-                      <RiLinkedinLine className="text-xl" />
-                    </a>
+                    <CiTwitter className="text-2xl" />
+                    <FiInstagram className="text-xl" />
+                    <RiLinkedinLine className="text-xl" />
                   </div>
                 </div>
               </SwiperSlide>
             ))}
           </Swiper>
 
-          {/* CUSTOM DOTS */}
           <div className="team-pagination flex justify-center gap-3 mt-8"></div>
         </div>
         <Services className="pb-0" />
