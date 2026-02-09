@@ -20,7 +20,7 @@ import Contact from './Components/Contact/Contact.jsx';
 import About from './Components/About/About.jsx';
 import ProductDetails from './Components/ProductDetails/ProductDetails.jsx';
 import CategoryProduct from './Components/CategoryProduct/CategoryProduct.jsx';
-import AuthProvider from './context/AuthContext';
+import AuthProvider from './context/AuthContext.jsx';
 import PrivateRoute from './routes/PrivateRoute.jsx';
 import OrderSuccess from './Components/OrderSuccess/OrderSuccess.jsx';
 import TrackOrder from './Components/TrackOrder/TrackOrder.jsx';
