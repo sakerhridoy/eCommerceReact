@@ -1,10 +1,10 @@
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
-import { ShopProvider } from './context/ShopContext/ShopContext.jsx';
+import { ShopProvider } from './context/ShopContext/ShopContext';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import CountDownContextProvider from './context/CountDownContext/CountDownContextProvider.jsx';
+import CountDownContextProvider from './context/CountDownContext/CountDownContextProvider';
 import MainRoute from './Components/MainRoute/MainRoute.jsx';
 import Shop from './Components/Shop/Shop.jsx';
 import NotFound from './Components/NotFound/NotFound.jsx';
