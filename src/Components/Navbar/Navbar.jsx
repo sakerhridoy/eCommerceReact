@@ -104,7 +104,7 @@ const Navbar = () => {
       <div className="bg-black py-2.5 text-white text-[10px] sm:text-sm px-4 lg:px-0">
         <div className="container flex justify-end-safe gap-20 lg:gap-[270px] items-center">
           <p className="">
-            <span className='hidden sm:inline-block'>Summer Sale For All Swim Suits And</span> Free ExpressDelivery - OFF 50%!
+            <span className='hidden md:inline-block'>Summer Sale For All Swim Suits And</span> Free ExpressDelivery - OFF 50%!
             <Link to="/shop" className="underline ps-2 sm:ps-4">
               ShopNow
             </Link>
@@ -162,11 +162,11 @@ const Navbar = () => {
         <div className="flex items-center justify-between py-4 lg:py-5">
           {/* Logo */}
           <Link to="/" onClick={closeMenu}>
-            <img src={logo} alt="Logo" className="h-9 md:h-10 w-auto" />
+            <img src={logo} alt="Logo" className="h-9 xl:h-10 w-auto" />
           </Link>
 
           {/* Desktop Menu */}
-          <ul className="hidden lg:flex items-center gap-9 text-[15px] font-medium text-gray-800">
+          <ul className="hidden lg:flex items-center gap-9 text-[12px] xl:text-base font-medium text-gray-800">
             <li>
               <Link to="/" onClick={closeMenu}>
                 Home
@@ -195,7 +195,7 @@ const Navbar = () => {
               </li>
             )}
           </ul>
-          <div className="flex items-center gap-4 lg:gap-6">
+          <div className="flex items-center gap-4 lg:gap-4 xl:gap-6">
             <form
               onSubmit={handleSearchSubmit}
               className="relative hidden sm:block min-w-[220px] md:min-w-[320px]"

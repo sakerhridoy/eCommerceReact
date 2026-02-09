@@ -8,7 +8,7 @@ const CategoryBanner = () => {
   const { seconds, minutes, hours, days } = useCountdown();
   return (
     <>
-      <section className="pb-[70px]">
+      <section className="pb-[70px] hidden md:block">
         <div className="container">
           <div className="pt-[69px] ">
             <div className="slider-container">
@@ -21,7 +21,7 @@ const CategoryBanner = () => {
                           Categories
                         </p>
                       </div>
-                      <h2 className="font-inter font-semibold text-[48px] leading[60px] pb-8 text-[#fafafa] tracking-[4%]">
+                      <h2 className="font-inter font-semibold md:text-[36px] lg:text-[48px] leading[60px] pb-8 text-[#fafafa] tracking-[4%]">
                         Enhance Your Music Experience
                       </h2>
                       {/* timer component start */}

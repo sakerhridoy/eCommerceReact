@@ -1,15 +1,16 @@
-import React from 'react'
-import newArrival1 from '../../assets/Images/newArrrivals1.png'
-import newArrival2 from '../../assets/Images/newArrrivals2.png'
-import newArrival3 from '../../assets/Images/newArrrivals3.png'
-import newArrival4 from '../../assets/Images/newArrrivals4.png'
-import { Link } from 'react-router'
+import React from 'react';
+import newArrival1 from '../../assets/Images/newArrrivals1.png';
+import newArrival2 from '../../assets/Images/newArrrivals2.png';
+import newArrival3 from '../../assets/Images/newArrrivals3.png';
+import newArrival4 from '../../assets/Images/newArrrivals4.png';
+import { Link } from 'react-router';
 
 const NewArrival = () => {
   return (
     <>
-      <section className="pb-[140px]">
+      <section className="pb-[140px] mx-4 xl:mx-0">
         <div className="container">
+          {/* TITLE */}
           <div className="section-title mb-[60px]">
             <div className="mb-5 relative after:absolute after:content-[''] after:w-5 after:h-full after:bg-[#DB4444] after:left-0 after:top-0 after:rounded-sm ps-9">
               <h4 className="font-poppins font-semibold text-base text-[#DB4444] leading-10">
@@ -22,9 +23,17 @@ const NewArrival = () => {
               </h2>
             </div>
           </div>
-          <div className="flex gap-[30px]">
-            <div className="w-1/2 bg-black pt-[90px] px-[30px] rounded-sm relative">
-              <img className="w-[511px] h-[511px]" src={newArrival1} alt="" />
+
+          {/* MAIN GRID */}
+          <div className="flex flex-col lg:flex-row gap-[30px]">
+            {/* LEFT BIG CARD */}
+            <div className="w-full lg:w-1/2 bg-black pt-[90px] px-[30px] rounded-sm relative">
+              <img
+                className="w-full max-w-[511px] h-auto mx-auto"
+                src={newArrival1}
+                alt=""
+              />
+
               <div className="w-[242px] absolute bottom-8 left-8">
                 <h4 className="font-inter font-semibold text-2xl text-[#fafafa] leading-6">
                   PlayStation 5
@@ -40,13 +49,17 @@ const NewArrival = () => {
                 </Link>
               </div>
             </div>
-            <div className="w-1/2 flex flex-col gap-8">
-              <div className="h-1/2 bg-black ps-[138px] rounded-sm relative">
+
+            {/* RIGHT SIDE */}
+            <div className="w-full lg:w-1/2 flex flex-col gap-8">
+              {/* TOP RIGHT */}
+              <div className="bg-black rounded-sm relative flex justify-end">
                 <img
-                  className="w-[432px] h-full rounded-tr-sm rounded-br-sm"
+                  className="w-full max-w-[432px] h-auto rounded-tr-sm rounded-br-sm"
                   src={newArrival2}
                   alt=""
                 />
+
                 <div className="w-[242px] absolute bottom-8 left-8">
                   <h4 className="font-inter font-semibold text-2xl text-[#fafafa] leading-6">
                     Women’s Collections
@@ -62,9 +75,13 @@ const NewArrival = () => {
                   </Link>
                 </div>
               </div>
-              <div className="h-1/2 flex gap-[30px]">
-                <div className="w-1/2 speakers py-[31px] px-[30px] relative rounded-sm">
-                  <img src={newArrival3} alt="" />
+
+              {/* BOTTOM RIGHT */}
+              <div className="flex flex-col sm:flex-row gap-[30px]">
+                {/* SPEAKERS */}
+                <div className="w-full sm:w-1/2 speakers py-[31px] px-[30px] relative rounded-sm">
+                  <img className="w-full h-auto" src={newArrival3} alt="" />
+
                   <div className="w-[191px] absolute bottom-8 left-8">
                     <h4 className="font-inter font-semibold text-2xl text-[#fafafa] leading-6">
                       Speakers
@@ -80,8 +97,11 @@ const NewArrival = () => {
                     </Link>
                   </div>
                 </div>
-                <div className="w-1/2 perfume py-[31px] px-[30px] relative rounded-sm">
-                  <img src={newArrival4} alt="" />
+
+                {/* PERFUME */}
+                <div className="w-full sm:w-1/2 perfume py-[31px] px-[30px] relative rounded-sm">
+                  <img className="w-full h-auto" src={newArrival4} alt="" />
+
                   <div className="w-[191px] absolute bottom-8 left-8">
                     <h4 className="font-inter font-semibold text-2xl text-[#fafafa] leading-6">
                       Perfume
@@ -104,6 +124,6 @@ const NewArrival = () => {
       </section>
     </>
   );
-}
+};
 
-export default NewArrival
+export default NewArrival;

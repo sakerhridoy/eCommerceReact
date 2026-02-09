@@ -15,13 +15,14 @@ const Services = ({ className = '' }) => {
 
   return (
     <>
-      <section className="pb-[140px]">
+      <section className="pb-[140px] mx-4 lg:mx-0">
         <div className="container relative">
-          <div className="flex gap-[88px] justify-center">
+          {/* SERVICES */}
+          <div className="flex flex-col sm:flex-row flex-wrap gap-10 lg:gap-20 justify-center">
             {/* CARD 1 */}
-            <div className="w-[22%] text-center">
-              <div className="w-20 h-20 bg-[rgba(47,46,48,0.3)] rounded-full p-[11px] text-center mx-auto">
-                <div className="w-[58px] h-[58px] bg-black rounded-full p-[11px] text-center">
+            <div className="w-full sm:w-[45%] lg:w-[22%] text-center">
+              <div className="w-20 h-20 bg-[rgba(47,46,48,0.3)] rounded-full p-[11px] mx-auto">
+                <div className="w-[58px] h-[58px] bg-black rounded-full p-[11px] flex items-center justify-center">
                   <TbTruckDelivery className="text-white text-4xl" />
                 </div>
               </div>
@@ -29,16 +30,16 @@ const Services = ({ className = '' }) => {
                 <h4 className="font-poppins font-semibold text-xl text-black pb-2">
                   FREE AND FAST DELIVERY
                 </h4>
-                <p className="font-poppins text-sm text-black">
+                <p className="font-poppins text-sm lg:text-xs xl:text-sm text-black">
                   Free delivery for all orders over $140
                 </p>
               </div>
             </div>
 
             {/* CARD 2 */}
-            <div className="w-[22%] text-center">
-              <div className="w-20 h-20 bg-[rgba(47,46,48,0.3)] rounded-full p-[11px] text-center mx-auto">
-                <div className="w-[58px] h-[58px] bg-black rounded-full p-[11px] text-center">
+            <div className="w-full sm:w-[45%] lg:w-[22%] text-center">
+              <div className="w-20 h-20 bg-[rgba(47,46,48,0.3)] rounded-full p-[11px] mx-auto">
+                <div className="w-[58px] h-[58px] bg-black rounded-full p-[11px] flex items-center justify-center">
                   <TfiHeadphoneAlt className="text-white text-4xl transform scale-x-[-1]" />
                 </div>
               </div>
@@ -46,16 +47,16 @@ const Services = ({ className = '' }) => {
                 <h4 className="font-poppins font-semibold text-xl text-black pb-2">
                   24/7 CUSTOMER SERVICE
                 </h4>
-                <p className="font-poppins text-sm text-black">
+                <p className="font-poppins text-sm lg:text-xs xl:text-sm text-black">
                   Friendly 24/7 customer support
                 </p>
               </div>
             </div>
 
             {/* CARD 3 */}
-            <div className="w-[22%] text-center">
-              <div className="w-20 h-20 bg-[rgba(47,46,48,0.3)] rounded-full p-[11px] text-center mx-auto">
-                <div className="w-[58px] h-[58px] bg-black rounded-full p-[11px] text-center">
+            <div className="w-full sm:w-[45%] lg:w-[22%] text-center">
+              <div className="w-20 h-20 bg-[rgba(47,46,48,0.3)] rounded-full p-[11px] mx-auto">
+                <div className="w-[58px] h-[58px] bg-black rounded-full p-[11px] flex items-center justify-center">
                   <GoShieldCheck className="text-white text-4xl" />
                 </div>
               </div>
@@ -63,7 +64,7 @@ const Services = ({ className = '' }) => {
                 <h4 className="font-poppins font-semibold text-xl text-black pb-2">
                   MONEY BACK GUARANTEE
                 </h4>
-                <p className="font-poppins text-sm text-black">
+                <p className="font-poppins text-sm lg:text-xs xl:text-sm text-black">
                   We return money within 30 days
                 </p>
               </div>
@@ -73,7 +74,8 @@ const Services = ({ className = '' }) => {
           {/* SCROLL TO TOP BUTTON */}
           <div
             onClick={scrollToTop}
-            className="bg-[#F5F5F5] w-[46px] h-[46px] p-[13px] rounded-full cursor-pointer text-center absolute -bottom-28 -right-11"
+            className="bg-[#F5F5F5] w-[46px] h-[46px] p-[13px] rounded-full cursor-pointer
+            text-center fixed bottom-6 right-6 lg:absolute lg:-bottom-28 lg:-right-11"
           >
             <HiOutlineArrowSmallUp className="text-xl text-black font-bold" />
           </div>

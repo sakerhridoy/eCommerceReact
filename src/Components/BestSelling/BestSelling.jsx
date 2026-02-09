@@ -3,8 +3,7 @@ import bestSelling from '../../assets/images/bestSelling.png';
 import bSelling2 from '../../assets/images/bSelling2.png';
 import bSelling3 from '../../assets/images/bSelling3.png';
 import bSelling4 from '../../assets/images/bSelling4.png';
-import { FaStar, FaStarHalfAlt } from 'react-icons/fa';
-import { FaRegHeart } from 'react-icons/fa';
+import { FaStar, FaStarHalfAlt, FaRegHeart } from 'react-icons/fa';
 import { IoEyeOutline } from 'react-icons/io5';
 import { useShop } from '../../Context/ShopContext/ShopContext';
 import { Link } from 'react-router';
@@ -49,12 +48,12 @@ const BestSelling = () => {
     },
   ];
 
-  const { addToCart, addToWishlist, wishlist, removeFromWishlist } = useShop();
+  const { addToWishlist, wishlist, removeFromWishlist } = useShop();
 
   const renderStars = rating => {
     const stars = [];
-    const fullStars = Math.floor(rating); 
-    const hasHalfStar = rating % 1 !== 0; 
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
 
     for (let i = 0; i < fullStars; i++) {
       stars.push(<FaStar key={`full-${i}`} className="text-[#FFAD33]" />);
@@ -68,75 +67,68 @@ const BestSelling = () => {
   };
 
   return (
-    <>
-      <section>
-        <div className="container">
-          <div className="section-title border-t border-[rgba(0,0,0,0.3)]">
-            <div className="section-title mb-[31px] pt-20">
-              <div className="mb-[13px] relative after:absolute after:content-[''] after:w-5 after:h-full after:bg-[#DB4444] after:left-0 after:top-0 after:rounded-sm ps-9">
-                <h4 className="font-poppins font-semibold text-base text-[#DB4444] leading-10">
-                  This Month
-                </h4>
-              </div>
+    <section className='mx-4 xl:mx-0'>
+      <div className="container">
+        <div className="section-title border-t border-[rgba(0,0,0,0.3)]">
+          <div className="mb-[31px] pt-20">
+            <div className="mb-[13px] relative after:absolute after:w-5 after:h-full after:bg-[#DB4444] after:left-0 after:top-0 after:rounded-sm ps-9">
+              <h4 className="font-poppins font-semibold text-base text-[#DB4444] leading-10">
+                This Month
+              </h4>
+            </div>
 
-              <div className="flex justify-between items-center gap-[470px]">
-                <h2 className="font-inter font-semibold text-4xl text-black">
-                  Best Selling Products
-                </h2>
+            {/* Responsive header (UI same) */}
+            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
+              <h2 className="font-inter font-semibold text-4xl text-black">
+                Best Selling Products
+              </h2>
 
-                <Link
-                  to="/shop"
-                  className="bg-[#DB4444] hover:bg-[#b80808] transition-all duration-300 text-center py-4 px-12 rounded-sm font-poppins font-medium text-base text-[#fafafa]"
-                >
-                  View All
-                </Link>
-              </div>
+              <Link
+                to="/shop"
+                className="bg-[#DB4444] hover:bg-[#b80808] transition-all duration-300 text-center py-4 px-12 rounded-sm font-poppins font-medium text-base text-[#fafafa] w-max hidden lg:inline-block"
+              >
+                View All
+              </Link>
             </div>
           </div>
+        </div>
 
-          {/* PRODUCT GRID */}
-          <div className="grid grid-cols-4 gap-[30px] pb-[140px]">
-            {bestSellingItems.map(item => {
-              const isWished = wishlist.some(w => w.id === item.id);
+        {/* RESPONSIVE GRID */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[30px] pb-20 lg:pb-[140px]">
+          {bestSellingItems.map(item => {
+            const isWished = wishlist.some(w => w.id === item.id);
 
-              const handleToggleWishlist = () => {
-                if (isWished) {
-                  removeFromWishlist(item.id);
-                } else {
-                  addToWishlist(item);
-                }
-              };
+            const handleToggleWishlist = () => {
+              isWished ? removeFromWishlist(item.id) : addToWishlist(item);
+            };
 
-              return (
-                <div key={item.id} className="item">
-                  <div className="bg-[#F5F5F5] py-[35px] rounded-sm relative">
-                    <Link to={`/product/${item.id}`}>
-                      <img className="mx-auto w-[172px]" src={item.img} alt="" />
+            return (
+              <div key={item.id} className="item">
+                <div className="bg-[#F5F5F5] py-[35px] rounded-sm relative">
+                  <Link to={`/product/${item.id}`}>
+                    <img className="mx-auto w-[172px]" src={item.img} alt="" />
+                  </Link>
+
+                  <div className="absolute top-3 right-3 px-3">
+                    <button
+                      onClick={handleToggleWishlist}
+                      className="bg-white p-[5px] rounded-full cursor-pointer mb-2"
+                    >
+                      <FaRegHeart
+                        className={`text-base ${
+                          isWished ? 'text-red-500' : 'text-black'
+                        }`}
+                      />
+                    </button>
+
+                    <Link
+                      to={`/product/${item.id}`}
+                      className="bg-white p-[5px] rounded-full flex items-center justify-center"
+                    >
+                      <IoEyeOutline className="text-base text-black" />
                     </Link>
-                    <div className="discount-badge absolute top-3 right-3 px-3">
-                      <button
-                        onClick={handleToggleWishlist}
-                        className="bg-white p-[5px] rounded-full cursor-pointer mb-2"
-                        aria-label={
-                          isWished ? 'Remove from wishlist' : 'Add to wishlist'
-                        }
-                      >
-                        <FaRegHeart
-                          className={`text-base ${
-                            isWished ? 'text-red-500' : 'text-black'
-                          }`}
-                        />
-                      </button>
-
-                      <Link
-                        to={`/product/${item.id}`}
-                        className="bg-white p-[5px] rounded-full cursor-pointer flex items-center justify-center"
-                        aria-label="View details"
-                      >
-                        <IoEyeOutline className="text-base text-black" />
-                      </Link>
-                    </div>
                   </div>
+                </div>
 
                 <Link to={`/product/${item.id}`}>
                   <div className="pt-4">
@@ -162,11 +154,17 @@ const BestSelling = () => {
               </div>
             );
           })}
-          </div>
-          {/* END GRID */}
         </div>
-      </section>
-    </>
+        <div className='block lg:hidden pb-[60px]'>
+          <Link
+            to="/shop"
+            className="bg-[#DB4444] hover:bg-[#b80808] transition-all duration-300 text-center py-4 px-12 rounded-sm font-poppins font-medium text-base text-[#fafafa] w-max"
+          >
+            View All
+          </Link>
+        </div>
+      </div>
+    </section>
   );
 };
 
