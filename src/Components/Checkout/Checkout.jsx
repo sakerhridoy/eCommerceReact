@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useShop } from '../../context/ShopContext/ShopContext';
+import { useShop } from '../../context/shopContext/ShopContext';
 import bkash from '../../assets/images/bkash.png';
 import visa from '../../assets/images/visa.png';
 import master from '../../assets/images/mastercard.png';

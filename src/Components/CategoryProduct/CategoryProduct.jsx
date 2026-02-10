@@ -4,7 +4,7 @@ import { FaRegHeart } from 'react-icons/fa';
 import { IoEyeOutline } from 'react-icons/io5';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { useShop } from '../../context/ShopContext/ShopContext';
+import { useShop } from '../../context/shopContext/ShopContext';
 
 const CategoryProduct = () => {
   const { addToCart, addToWishlist } = useShop();

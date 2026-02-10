@@ -15,7 +15,7 @@ import { Navigation, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { Link } from 'react-router';
-import { useShop } from '../../context/ShopContext/ShopContext';
+import { useShop } from '../../context/shopContext/ShopContext';
 
 const FlashSales = () => {
   const { seconds, minutes, hours, days } = useCountdown();

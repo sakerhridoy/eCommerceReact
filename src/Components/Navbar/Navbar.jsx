@@ -9,7 +9,7 @@ import { TbLogout2 } from 'react-icons/tb';
 import { RxHamburgerMenu } from 'react-icons/rx';
 import logo from '../../assets/images/logo.png';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useShop } from '../../context/ShopContext/ShopContext';
+import { useShop } from '../../context/shopContext/ShopContext';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 

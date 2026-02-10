@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { FaStar, FaRegHeart } from 'react-icons/fa';
 import { FiMinus } from 'react-icons/fi';
 import { FaPlus } from 'react-icons/fa6';
-import { useShop } from '../../context/ShopContext/ShopContext';
+import { useShop } from '../../context/shopContext/ShopContext';
 import { TbTruckDelivery } from 'react-icons/tb';
 import { BsArrowRepeat } from 'react-icons/bs';
 import { IoEyeOutline } from 'react-icons/io5';
