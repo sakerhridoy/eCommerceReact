@@ -1,10 +1,9 @@
-// src/pages/TrackOrder.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const TrackOrder = () => {
   const [orderId, setOrderId] = useState('');
-  const [contact, setContact] = useState(''); // email or phone
+  const [contact, setContact] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
@@ -21,9 +20,7 @@ const TrackOrder = () => {
     setError('');
     setResult(null);
 
-    // Simulate API call (replace with real backend later)
     setTimeout(() => {
-      // Fake successful response
       if (orderId === 'ORD123456' || orderId === '123456') {
         setResult({
           orderId: orderId.toUpperCase(),
@@ -61,10 +58,10 @@ const TrackOrder = () => {
   };
 
   return (
-    <section className="pb-35 bg-gray-50 min-h-screen">
-      <div className="container mx-auto px-4">
+    <section className="bg-gray-50 min-h-screen pb-35">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
-        <div className="py-20">
+        <div className="py-16 sm:py-20">
           <p className="font-poppins text-sm text-black/50">
             <Link to="/" className="hover:text-[#DB4444] transition">
               Home
@@ -74,13 +71,13 @@ const TrackOrder = () => {
         </div>
 
         <div className="max-w-3xl mx-auto">
-          <h1 className="font-inter font-medium text-3xl md:text-4xl text-center mb-12">
+          <h1 className="font-inter font-medium text-2xl sm:text-3xl md:text-4xl text-center mb-8 sm:mb-12">
             Track Your Order
           </h1>
 
           {/* Form Card */}
-          <div className="bg-white shadow-sm rounded-sm p-8 md:p-12 mb-12">
-            <form onSubmit={handleTrack} className="space-y-6">
+          <div className="bg-white shadow-sm rounded-sm p-6 sm:p-8 md:p-12 mb-10 sm:mb-12">
+            <form onSubmit={handleTrack} className="space-y-5 sm:space-y-6">
               <div>
                 <label className="block font-poppins text-base text-black/70 mb-2">
                   Order ID <span className="text-[#DB4444]">*</span>
@@ -130,26 +127,28 @@ const TrackOrder = () => {
 
           {/* Tracking Result */}
           {result && (
-            <div className="bg-white shadow-sm rounded-sm p-8 md:p-12">
-              <div className="text-center mb-8">
-                <h2 className="font-inter font-medium text-2xl text-black mb-2">
+            <div className="bg-white shadow-sm rounded-sm p-6 sm:p-8 md:p-12">
+              <div className="text-center mb-6 sm:mb-8">
+                <h2 className="font-inter font-medium text-xl sm:text-2xl text-black mb-2">
                   Order #{result.orderId}
                 </h2>
-                <p className="text-[#00CC66] font-medium text-lg">
+                <p className="text-[#00CC66] font-medium text-base sm:text-lg">
                   {result.status}
                 </p>
-                <p className="text-black/60 mt-1">
+                <p className="text-black/60 mt-1 text-sm sm:text-base">
                   Estimated Delivery: {result.estimatedDelivery}
                 </p>
               </div>
 
               {/* Timeline */}
-              <div className="space-y-6">
+              <div className="space-y-5 sm:space-y-6">
                 {result.history.map((step, index) => (
-                  <div key={index} className="flex gap-4">
+                  <div key={index} className="flex items-start gap-3 sm:gap-4">
                     <div className="shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-[#DB4444]/10 flex items-center justify-center">
-                        <span className="text-[#DB4444] text-xl">✓</span>
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#DB4444]/10 flex items-center justify-center">
+                        <span className="text-[#DB4444] text-lg sm:text-xl">
+                          ✓
+                        </span>
                       </div>
                     </div>
                     <div>
@@ -161,14 +160,14 @@ const TrackOrder = () => {
                 ))}
               </div>
 
-              <div className="mt-10 text-center">
-                <p className="text-black/60 mb-6">
+              <div className="mt-8 sm:mt-10 text-center">
+                <p className="text-black/60 mb-5 sm:mb-6">
                   Need help? Contact us at{' '}
                   <span className="text-[#DB4444]">support@exclusive.com</span>
                 </p>
                 <Link
                   to="/contact"
-                  className="inline-block bg-[#DB4444] text-white px-10 py-3 rounded-sm font-medium hover:bg-[#c0392b] transition"
+                  className="inline-block bg-[#DB4444] text-white px-8 sm:px-10 py-3 rounded-sm font-medium hover:bg-[#c0392b] transition"
                 >
                   Contact Support
                 </Link>

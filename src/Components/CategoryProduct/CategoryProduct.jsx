@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import explore from '../../assets/images/explore.png';
 import { FaStar } from 'react-icons/fa';
 import { FaRegHeart } from 'react-icons/fa';
 import { IoEyeOutline } from 'react-icons/io5';

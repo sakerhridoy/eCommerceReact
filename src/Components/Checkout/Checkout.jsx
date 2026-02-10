@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useShop } from '../../context/ShopContext/ShopContext';
-import bkash from '../../assets/Images/Bkash.png';
-import visa from '../../assets/Images/Visa.png';
-import master from '../../assets/Images/Mastercard.png';
-import nagad from '../../assets/Images/Nagad.png';
+import bkash from '../../assets/images/bkash.png';
+import visa from '../../assets/images/visa.png';
+import master from '../../assets/images/mastercard.png';
+import nagad from '../../assets/images/nagad.png';
 
 const Checkout = () => {
   const { cart } = useShop();

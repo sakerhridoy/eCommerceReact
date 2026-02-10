@@ -7,7 +7,7 @@ import { LuUser, LuShoppingBag, LuStar } from 'react-icons/lu';
 import { AiOutlineCloseCircle } from 'react-icons/ai';
 import { TbLogout2 } from 'react-icons/tb';
 import { RxHamburgerMenu } from 'react-icons/rx';
-import logo from '../../assets/Images/logo.png';
+import logo from '../../assets/images/logo.png';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useShop } from '../../context/ShopContext/ShopContext';
 import { useAuth } from '../../context/AuthContext';

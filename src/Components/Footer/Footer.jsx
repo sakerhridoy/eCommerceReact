@@ -1,8 +1,8 @@
 import React from 'react';
-import footerLogo from '../../assets/Images/footerLogo.png';
-import qrCode from '../../assets/Images/qrCode.png';
-import appStore from '../../assets/Images/appStore.png';
-import playStore from '../../assets/Images/playStore.png';
+import footerLogo from '../../assets/images/footerLogo.png';
+import qrCode from '../../assets/images/qrCode.png';
+import appStore from '../../assets/images/appStore.png';
+import playStore from '../../assets/images/playStore.png';
 import { RiFacebookLine } from 'react-icons/ri';
 import { RiTwitterLine } from 'react-icons/ri';
 import { IoLogoInstagram } from 'react-icons/io';

@@ -1,5 +1,5 @@
 import React from 'react';
-import categoryBanner from '../../assets/Images/categoryBanner.png';
+import categoryBanner from '../../assets/images/categoryBanner.png';
 import { useCountdown } from '../../context/CountDownContext/CountDownContextProvider';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router';

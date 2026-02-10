@@ -1,8 +1,8 @@
 import React from 'react';
-import newArrival1 from '../../assets/Images/newArrrivals1.png';
-import newArrival2 from '../../assets/Images/newArrrivals2.png';
-import newArrival3 from '../../assets/Images/newArrrivals3.png';
-import newArrival4 from '../../assets/Images/newArrrivals4.png';
+import newArrival1 from '../../assets/images/newArrrivals1.png';
+import newArrival2 from '../../assets/images/newArrrivals2.png';
+import newArrival3 from '../../assets/images/newArrrivals3.png';
+import newArrival4 from '../../assets/images/newArrrivals4.png';
 import { Link } from 'react-router';
 
 const NewArrival = () => {

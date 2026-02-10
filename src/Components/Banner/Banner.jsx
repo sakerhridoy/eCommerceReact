@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import banner from '../../assets/Images/banner.png';
-import iphone15 from '../../assets/Images/iphone15.png';
-import iphone16 from '../../assets/Images/iphone16.png';
-import apple from '../../assets/Images/appleLogo.png';
+import banner from '../../assets/images/banner.png';
+import iphone15 from '../../assets/images/iphone15.png';
+import iphone16 from '../../assets/images/iphone16.png';
+import apple from '../../assets/images/appleLogo.png';
 import { IoArrowForward } from 'react-icons/io5';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
