@@ -30,7 +30,7 @@ export const ShopProvider = ({ children }) => {
         return prev.map(item =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
-            : item
+            : item,
         );
       }
       return [...prev, { ...product, quantity: 1 }];
@@ -41,8 +41,8 @@ export const ShopProvider = ({ children }) => {
   const incrementQuantity = id => {
     setCart(prev =>
       prev.map(item =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
+      ),
     );
   };
 
@@ -52,12 +52,11 @@ export const ShopProvider = ({ children }) => {
       prev.map(item =>
         item.id === id
           ? { ...item, quantity: Math.max(item.quantity - 1, 1) }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
-  
   const removeFromCart = id => {
     setCart(prevCart => prevCart.filter(item => item.id !== id));
   };
@@ -84,8 +83,8 @@ export const ShopProvider = ({ children }) => {
         addToWishlist,
         incrementQuantity,
         decrementQuantity,
-        removeFromCart, 
-        removeFromWishlist, 
+        removeFromCart,
+        removeFromWishlist,
       }}
     >
       {children}

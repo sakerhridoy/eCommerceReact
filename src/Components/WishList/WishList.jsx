@@ -2,7 +2,7 @@ import React from 'react';
 import { IoEyeOutline } from 'react-icons/io5';
 import { FaStar, FaHeart } from 'react-icons/fa';
 import { Link } from 'react-router';
-import { useShop } from '../../context/shopContext/ShopContext';
+import { useShop } from '../../context/ShopContext';
 
 const WishList = () => {
   const { wishlist, addToCart, removeFromWishlist } = useShop();
