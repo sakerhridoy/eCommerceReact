@@ -74,6 +74,7 @@ const CategoryProduct = () => {
                 <Link to={`/product/${product.id}`}>{product.title}</Link>
               </h3>
 
+              
               <div className="flex gap-2 items-center flex-wrap">
                 <p className="font-poppins font-medium text-[#DB4444] text-[16px] leading-6">
                   ${product.price}
