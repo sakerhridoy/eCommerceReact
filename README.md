@@ -2,7 +2,11 @@
 
 This is a modern e-commerce application built with React and Vite, using Firebase for authentication and TailwindCSS for styling.
 
-## Live demo: https://e-commerce-react-eight-gules.vercel.app/
+## Live demo: 
+
+### https://e-commerce-react-eight-gules.vercel.app/
+or,
+### https://full-ecommece.netlify.app/
 
 ### Prerequisites
 
