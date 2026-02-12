@@ -5,7 +5,7 @@ import bSelling3 from '../../assets/images/bSelling3.png';
 import bSelling4 from '../../assets/images/bSelling4.png';
 import { FaStar, FaStarHalfAlt, FaRegHeart } from 'react-icons/fa';
 import { IoEyeOutline } from 'react-icons/io5';
-import { useShop } from '../../context/ShopContext';
+import { useShop } from '../../contexts/ShopContext';
 import { Link } from 'react-router';
 
 const BestSelling = () => {

@@ -9,9 +9,9 @@ import { TbLogout2 } from 'react-icons/tb';
 import { RxHamburgerMenu } from 'react-icons/rx';
 import logo from '../../assets/images/logo.png';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useShop } from '../../context/ShopContext';
+import { useShop } from '../../contexts/ShopContext';
 import axios from 'axios';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Navbar = () => {
   const location = useLocation();

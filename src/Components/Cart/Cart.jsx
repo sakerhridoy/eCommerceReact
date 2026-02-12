@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router';
-import { useShop } from '../../context/ShopContext';
+import { useShop } from '../../contexts/ShopContext';
 import {
   MdOutlineKeyboardArrowUp,
   MdOutlineKeyboardArrowDown,

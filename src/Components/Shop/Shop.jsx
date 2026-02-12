@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { FaStar, FaRegHeart } from 'react-icons/fa6';
 import { IoEyeOutline } from 'react-icons/io5';
 import axios from 'axios';
-import { useShop } from '../../context/ShopContext';
+import { useShop } from '../../contexts/ShopContext';
 import Swal from 'sweetalert2';
 
 const Shop = () => {

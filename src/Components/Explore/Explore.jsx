@@ -16,7 +16,7 @@ import 'swiper/css/grid';
 import 'swiper/css/pagination';
 
 import { Link } from 'react-router-dom';
-import { useShop } from '../../context/ShopContext';
+import { useShop } from '../../contexts/ShopContext';
 
 const Explore = () => {
   const swiperRef = useRef(null);

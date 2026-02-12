@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import signupImg from '../../assets/images/signup.png';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
