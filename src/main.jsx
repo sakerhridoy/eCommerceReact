@@ -42,14 +42,13 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-      { path: 'myAccount', Component: MyAccount },
       { path: 'contact', Component: Contact },
       { path: 'about', Component: About },
       { path: 'product/:id', Component: ProductDetails },
       { path: 'products/category/:slug', Component: CategoryProduct },
       { path: '*', Component: NotFound },
-      { path: '/order-success', Component: OrderSuccess },
-      { path: '/track-order', Component: TrackOrder },
+      { path: 'order-success', Component: OrderSuccess },
+      { path: 'track-order', Component: TrackOrder },
     ],
   },
 ]);
