@@ -1,4 +1,4 @@
-# E-commerce React + Vite App
+## E-commerce React + Vite App
 
 This is a modern e-commerce application built with React and Vite, using Firebase for authentication and TailwindCSS for styling.
 
