@@ -87,9 +87,8 @@ export const normalizeProduct = product => {
 
 export const getProducts = async params => {
   const response = await api.get('/products', { params });
-  return getCollection(getResponseData(response), 'products').map(
-    normalizeProduct,
-  );
+  const products = getCollection(getResponseData(response), 'products');
+  return Array.isArray(products) ? products.map(normalizeProduct) : [];
 };
 
 export const getCategories = async () => {

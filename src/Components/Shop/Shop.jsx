@@ -18,7 +18,7 @@ const Shop = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 9;
+  const productsPerPage = 12;
 
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get('category') || '';

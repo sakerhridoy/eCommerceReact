@@ -15,11 +15,8 @@ const AdminProductList = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const data = await getProducts({ limit: 1000 });
-      const productList = Array.isArray(data)
-        ? data
-        : data.products || data.data || [];
-      setProducts(productList);
+      const productList = await getProducts({ limit: 1000 });
+      setProducts(Array.isArray(productList) ? productList : []);
     } catch (error) {
       console.error('Failed to fetch products:', error);
       Swal.fire('Error', 'Failed to load products', 'error');
