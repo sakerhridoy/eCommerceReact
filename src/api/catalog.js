@@ -87,13 +87,15 @@ export const normalizeProduct = product => {
 
 export const getProducts = async params => {
   const response = await api.get('/products', { params });
-  const products = getCollection(getResponseData(response), 'products');
+  const rawData = getResponseData(response);
+  const products = getCollection(rawData, 'products');
   return Array.isArray(products) ? products.map(normalizeProduct) : [];
 };
 
 export const getCategories = async () => {
   const response = await api.get('/categories');
-  return getCollection(getResponseData(response), 'categories');
+  const rawData = getResponseData(response);
+  return getCollection(rawData, 'categories');
 };
 
 export const getCategoryBySlug = async slug => {
@@ -113,7 +115,7 @@ export const getProductById = async id => {
 export const getHomeData = async () => {
   const response = await api.get('/home');
   const payload = getResponseData(response);
-  const homeData = payload?.home ?? payload ?? {};
+  const homeData = payload?.data || payload || {};
 
   return {
     ...homeData,
@@ -177,8 +179,6 @@ export const updateAdminOrderStatus = async (orderId, status) => {
 export const getAllCustomers = async () => {
   try {
     const response = await api.get('/dashboard/customers');
-
-    console.log('Raw Response from Backend:', response.data);
     return response.data.data || response.data || [];
   } catch (error) {
     console.error('Error fetching customers:', error);
