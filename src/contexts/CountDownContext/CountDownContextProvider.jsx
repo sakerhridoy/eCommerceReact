@@ -5,7 +5,7 @@ import { useTimer } from 'react-timer-hook';
 export const CountDownContext = createContext();
 
 const CountDownContextProvider = ({ children }) => {
-  const expiryTimestamp = new Date('2025-12-31T23:59:00');
+  const expiryTimestamp = new Date('2026-12-31T23:59:00');
 
   const timerValue = useTimer({ expiryTimestamp });
 

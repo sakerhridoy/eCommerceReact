@@ -8,7 +8,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Slider from 'react-slick';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { getCategories } from '../../api/catalog';
 
 const Banner = () => {
   /* ================= BANNER DATA ================= */
@@ -48,15 +48,7 @@ const Banner = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get(
-          'https://dummyjson.com/products/categories',
-        );
-
-        if (Array.isArray(res.data)) {
-          setCategories(res.data);
-        } else {
-          setCategories([]);
-        }
+        setCategories(await getCategories());
       } catch (err) {
         setCategories([]);
         setError('Failed to load categories');

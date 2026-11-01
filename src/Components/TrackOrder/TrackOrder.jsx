@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../../api/client';
 
 const TrackOrder = () => {
   const [orderId, setOrderId] = useState('');
@@ -8,7 +9,7 @@ const TrackOrder = () => {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
 
-  const handleTrack = e => {
+  const handleTrack = async e => {
     e.preventDefault();
 
     if (!orderId.trim() || !contact.trim()) {
@@ -20,41 +21,20 @@ const TrackOrder = () => {
     setError('');
     setResult(null);
 
-    setTimeout(() => {
-      if (orderId === 'ORD123456' || orderId === '123456') {
-        setResult({
-          orderId: orderId.toUpperCase(),
-          status: 'In Transit',
-          estimatedDelivery: 'February 07, 2026',
-          currentLocation: 'Sylhet Sorting Hub',
-          history: [
-            {
-              date: 'Feb 04, 2026 10:30 AM',
-              event: 'Order Placed',
-              location: 'Sylhet',
-            },
-            {
-              date: 'Feb 04, 2026 02:15 PM',
-              event: 'Order Confirmed',
-              location: 'Dhaka',
-            },
-            {
-              date: 'Feb 05, 2026 09:45 AM',
-              event: 'Shipped',
-              location: 'Dhaka Hub',
-            },
-            {
-              date: 'Feb 05, 2026 04:20 PM',
-              event: 'In Transit',
-              location: 'Sylhet Sorting Hub',
-            },
-          ],
-        });
-      } else {
-        setError('No order found with this ID. Please check and try again.');
-      }
+    try {
+      const { data } = await api.post('/orders/track', {
+        orderNumber: orderId.trim(),
+        contact: contact.trim(),
+      });
+      setResult(data.data);
+    } catch (requestError) {
+      setError(
+        requestError.response?.data?.message ||
+          'Could not find an order matching those details.',
+      );
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -130,34 +110,20 @@ const TrackOrder = () => {
             <div className="bg-white shadow-sm rounded-sm p-6 sm:p-8 md:p-12">
               <div className="text-center mb-6 sm:mb-8">
                 <h2 className="font-inter font-medium text-xl sm:text-2xl text-black mb-2">
-                  Order #{result.orderId}
+                  Order #{result.orderNumber}
                 </h2>
                 <p className="text-[#00CC66] font-medium text-base sm:text-lg">
-                  {result.status}
+                  {result.orderStatus}
                 </p>
                 <p className="text-black/60 mt-1 text-sm sm:text-base">
-                  Estimated Delivery: {result.estimatedDelivery}
+                  Placed: {new Date(result.createdAt).toLocaleString()}
                 </p>
               </div>
 
-              {/* Timeline */}
               <div className="space-y-5 sm:space-y-6">
-                {result.history.map((step, index) => (
-                  <div key={index} className="flex items-start gap-3 sm:gap-4">
-                    <div className="shrink-0">
-                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#DB4444]/10 flex items-center justify-center">
-                        <span className="text-[#DB4444] text-lg sm:text-xl">
-                          ✓
-                        </span>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="font-medium text-black">{step.event}</p>
-                      <p className="text-sm text-black/60">{step.date}</p>
-                      <p className="text-sm text-black/50">{step.location}</p>
-                    </div>
-                  </div>
-                ))}
+                <p className="font-medium text-black">
+                  Latest update: {new Date(result.updatedAt).toLocaleString()}
+                </p>
               </div>
 
               <div className="mt-8 sm:mt-10 text-center">

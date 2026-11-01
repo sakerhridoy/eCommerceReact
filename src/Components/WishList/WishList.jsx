@@ -2,10 +2,12 @@ import React from 'react';
 import { IoEyeOutline } from 'react-icons/io5';
 import { FaStar, FaHeart } from 'react-icons/fa';
 import { Link } from 'react-router';
-import { useShop } from '../../contexts/ShopContext';
+import useShopStore from '../../store/cartStore';
 
 const WishList = () => {
-  const { wishlist, addToCart, removeFromWishlist } = useShop();
+  const wishlist = useShopStore(state => state.wishlist);
+  const addToCart = useShopStore(state => state.addToCart);
+  const removeFromWishlist = useShopStore(state => state.removeFromWishlist);
 
   const getItemImage = item => item.img || item.thumbnail || item.image || '';
 
@@ -76,7 +78,7 @@ const WishList = () => {
               <div className="pt-4">
                 <h3 className="text-base font-medium">{getItemName(item)}</h3>
                 <p className="py-2 font-medium">
-                  <span className="text-[#DB4444]">${getItemPrice(item)}</span>
+                  <span className="text-[#DB4444]">৳{getItemPrice(item)}</span>
                 </p>
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (

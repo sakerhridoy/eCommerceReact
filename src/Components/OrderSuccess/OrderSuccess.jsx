@@ -1,103 +1,96 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { FaCheckCircle } from 'react-icons/fa';
+import { MdOutlineRemoveShoppingCart } from 'react-icons/md';
 
 const OrderSuccess = () => {
-  const location = useLocation();
-  const orderNumber =
-    location.state?.orderNumber ||
-    'ORD' + Math.floor(100000 + Math.random() * 900000);
-  const total = location.state?.total || '0.00';
+  const [searchParams] = useSearchParams();
+  const orderId = searchParams.get('orderId');
+  const navigate = useNavigate();
+
+  const [countdown, setCountdown] = useState(20);
+
+  useEffect(() => {
+    if (orderId) {
+      const timer = setInterval(() => {
+        setCountdown(prev => prev - 1);
+      }, 1000);
+      if (countdown === 0) {
+        navigate('/my-orders', { replace: true });
+      }
+
+      return () => clearInterval(timer);
+    }
+  }, [orderId, countdown, navigate]);
 
   return (
-    <section className="pb-35 bg-gray-50 min-h-screen">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
-        <div className="font-poppins font-normal text-sm text-black/50 py-20">
-          <Link to="/" className="hover:text-[#DB4444]">
-            Home
-          </Link>{' '}
-          /{' '}
-          <Link to="/cart" className="hover:text-[#DB4444]">
-            Cart
-          </Link>{' '}
-          / <span className="text-black">Checkout</span> /{' '}
-          <span className="text-[#DB4444] font-medium">Order Confirmed</span>
-        </div>
+    <section className="py-20 md:py-32 font-poppins bg-gray-50/30 min-h-[60vh] flex items-center">
+      <div className="container mx-auto px-4 text-center">
+        {orderId ? (
+          <div className="max-w-xl mx-auto bg-white p-8 md:p-12 rounded-sm shadow-[0px_0px_20px_rgba(0,0,0,0.05)] border border-gray-100">
+            <FaCheckCircle className="text-6xl md:text-7xl text-green-500 mx-auto mb-6 drop-shadow-sm animate-bounce" />
 
-        <div className="max-w-3xl mx-auto bg-white rounded-sm shadow-sm p-8 sm:p-10 md:p-16 text-center">
-          {/* Success Icon */}
-          <div className="mb-10">
-            <div className="w-24 h-24 mx-auto bg-[#DB4444]/10 rounded-full flex items-center justify-center">
-              <svg
-                className="w-14 h-14 text-[#DB4444]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
+            <h2 className="text-3xl md:text-4xl font-inter font-semibold mb-4 text-black">
+              Order Successful!
+            </h2>
+
+            <p className="text-gray-600 mb-6 text-sm md:text-base leading-relaxed">
+              Thank you for your purchase. Your order has been placed
+              successfully and is currently being processed.
+            </p>
+
+            <div className="bg-[#F5F5F5] p-5 rounded-sm mb-8 inline-block w-full border border-gray-200">
+              <p className="text-sm text-gray-500 mb-1 font-medium">
+                Transaction / Order ID:
+              </p>
+              <p className="text-lg font-semibold text-black break-all tracking-wide">
+                {orderId}
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Link
+                to="/my-orders"
+                className="bg-[#DB4444] text-white px-8 py-3.5 rounded-sm font-medium hover:bg-red-600 transition-colors shadow-sm"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
+                View My Orders
+              </Link>
+              <Link
+                to="/shop"
+                className="bg-gray-900 text-white px-8 py-3.5 rounded-sm font-medium hover:bg-black transition-colors shadow-sm"
+              >
+                Continue Shopping
+              </Link>
             </div>
+
+            <p className="text-xs text-gray-400 mt-8 font-medium">
+              Redirecting to your account in{' '}
+              <span className="text-[#DB4444] text-sm">{countdown}</span>{' '}
+              seconds...
+            </p>
           </div>
+        ) : (
+          /* ================= ERROR ================= */
+          <div className="max-w-lg mx-auto bg-white p-8 md:p-12 rounded-sm shadow-[0px_0px_20px_rgba(0,0,0,0.05)] border border-gray-100">
+            <MdOutlineRemoveShoppingCart className="text-6xl md:text-7xl text-[#DB4444] mx-auto mb-6 opacity-80" />
 
-          <h1 className="font-inter font-medium text-4xl sm:text-4xl md:text-5xl text-black mb-6 leading-tight">
-            Thank You For Your Order!
-          </h1>
+            <h2 className="text-2xl md:text-3xl font-inter font-semibold mb-4 text-black">
+              No recent order found
+            </h2>
 
-          <p className="font-poppins text-lg text-black/70 mb-10 max-w-xl mx-auto">
-            Your order has been successfully placed. We're preparing your items
-            and will notify you once they are on the way.
-          </p>
-
-          {/* Order Summary Card */}
-          <div className="bg-[#F5F5F5] rounded-sm p-6 sm:p-8 mb-12 text-left">
-            <div className="space-y-4">
-              <div className="flex justify-between font-poppins text-base flex-wrap">
-                <span className="text-black/70">Order Number:</span>
-                <span className="font-medium">{orderNumber}</span>
-              </div>
-              <div className="flex justify-between font-poppins text-base flex-wrap">
-                <span className="text-black/70">Order Total:</span>
-                <span className="font-medium">${total}</span>
-              </div>
-              <div className="flex justify-between font-poppins text-base flex-wrap">
-                <span className="text-black/70">Payment Method:</span>
-                <span className="font-medium">Cash on Delivery</span>
-              </div>
-              <div className="flex justify-between font-poppins text-base flex-wrap">
-                <span className="text-black/70">Estimated Delivery:</span>
-                <span className="font-medium">3-5 Business Days</span>
-              </div>
-            </div>
-          </div>
-
-          <p className="font-poppins text-base text-black/60 mb-12">
-            A confirmation email has been sent to your email address with all
-            the order details.
-          </p>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 flex-wrap">
-            <Link
-              to="/track-order"
-              className="bg-[#DB4444] text-white font-poppins font-medium text-base py-5 px-12 rounded-sm hover:bg-[#c0392b] transition-colors w-full sm:w-auto text-center"
-            >
-              Track Your Order
-            </Link>
+            <p className="text-gray-500 mb-8 text-sm md:text-base">
+              We couldn't find any valid order details in this link. Please
+              check your account or continue shopping.
+            </p>
 
             <Link
-              to="/"
-              className="border border-[#DB4444] text-[#DB4444] font-poppins font-medium text-base py-5 px-12 rounded-sm hover:bg-[#DB4444]/10 transition-colors w-full sm:w-auto text-center"
+              to="/shop"
+              className="bg-[#DB4444] text-white px-8 py-3.5 rounded-sm font-medium hover:bg-red-600 transition-colors inline-block shadow-sm"
             >
-              Continue Shopping
+              Back to Shop
             </Link>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );

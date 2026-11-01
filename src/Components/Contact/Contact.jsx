@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiPhone, FiMail } from 'react-icons/fi';
+import api from '../../api/client';
 
 const Contact = () => {
   const [form, setForm] = useState({
@@ -80,18 +81,21 @@ const Contact = () => {
     setStatus({ type: '', message: '' });
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1200)); // fake delay
+      await api.post('/contact', form);
 
       setStatus({
         type: 'success',
-        message: 'Thank you! Your message has been sent successfully.',
+        message:
+          'Thank you! Your message has been sent successfully to our inbox.',
       });
 
       setForm({ name: '', email: '', phone: '', message: '' });
     } catch (err) {
       setStatus({
         type: 'error',
-        message: 'Something went wrong. Please try again later.',
+        message:
+          err.response?.data?.message ||
+          'Something went wrong. Please try again later.',
       });
     } finally {
       setIsSubmitting(false);
@@ -101,7 +105,6 @@ const Contact = () => {
   return (
     <section className="pb-25 md:pb-35">
       <div className="container mx-auto px-4">
-        {/* Breadcrumb */}
         <div className="py-10 md:py-20">
           <p className="text-sm text-black/50 font-poppins font-normal leading-5.25">
             <Link to="/">Home</Link> /{' '}
@@ -110,9 +113,7 @@ const Contact = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          {/* ================= LEFT INFO ================= */}
           <div className="rounded-sm px-5 sm:px-8.75 pt-10 pb-12.5 shadow-sm">
-            {/* Call */}
             <div>
               <div className="flex items-center gap-4 mb-6">
                 <span className="w-10 h-10 bg-[#DB4444] text-white rounded-full flex items-center justify-center">
@@ -132,7 +133,6 @@ const Contact = () => {
 
             <hr />
 
-            {/* Write */}
             <div className="mt-8">
               <div className="flex items-center gap-4 mb-6">
                 <span className="w-10 h-10 bg-[#DB4444] text-white rounded-full flex items-center justify-center">
@@ -146,7 +146,7 @@ const Contact = () => {
                 Fill out our form and we will contact you within 24 hours.
               </p>
               <p className="text-sm font-poppins font-normal leading-5.25 text-black mb-4">
-                Emails: customer@exclusive.com
+                Emails: sakerahmedhridoy@gmail.com
               </p>
               <p className="text-sm font-poppins font-normal leading-5.25 text-black">
                 Emails: support@exclusive.com

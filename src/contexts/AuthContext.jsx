@@ -1,12 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  updateProfile,
-} from 'firebase/auth';
-import { auth } from '../firebase/firebase.config';
+import api from '../api/client';
 
 const AuthContext = createContext();
 
@@ -16,31 +9,52 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Signup
   const signup = async (email, password, name) => {
-    const res = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(res.user, { displayName: name });
-    setUser(res.user);
-    return res;
+    const { data } = await api.post('/auth/register', { email, password, name });
+    setUser(data.data.user);
+    return data.data.user;
   };
 
-  // Login
-  const login = (email, password) => {
-    return signInWithEmailAndPassword(auth, email, password);
+  const login = async (email, password) => {
+    const { data } = await api.post('/auth/login', { email, password });
+    setUser(data.data.user);
+    return data.data.user;
   };
 
-  // Logout
-  const logout = () => signOut(auth);
+  const logout = async () => {
+    await api.post('/auth/logout');
+    setUser(null);
+  };
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, currentUser => {
-      setUser(currentUser);
-      setLoading(false);
-    });
-    return unsub;
+    let active = true;
+
+    const restoreSession = async () => {
+      try {
+        let response;
+        try {
+          response = await api.get('/auth/profile');
+        } catch (error) {
+          if (error.response?.status !== 401) throw error;
+          await api.post('/auth/refresh');
+          response = await api.get('/auth/profile');
+        }
+        if (active) setUser(response.data.data);
+      } catch (error) {
+        if (error.response?.status !== 401) {
+          console.error('Failed to restore the authentication session:', error);
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    restoreSession();
+    return () => {
+      active = false;
+    };
   }, []);
 
-  // 🔥 setUser export kora hoise
   const value = {
     user,
     setUser,

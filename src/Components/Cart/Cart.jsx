@@ -8,19 +8,23 @@ import {
 import { IoMdCloseCircle } from 'react-icons/io';
 
 const Cart = () => {
-  const { cart, incrementQuantity, decrementQuantity, removeFromCart } =
-    useShop();
+  const {
+    cart,
+    cartSubtotal,
+    incrementQuantity,
+    decrementQuantity,
+    removeFromCart,
+    clearCart,
+  } = useShop();
   const shippingCost = 0;
 
-  const getItemPrice = item => item.dPrice ?? item.price ?? 0;
+  const getItemPrice = item =>
+    item.discountPrice ?? item.dPrice ?? item.price ?? 0;
   const getItemImage = item => item.img || item.thumbnail || item.image || '';
   const getItemName = item => item.name || item.title || 'Product';
 
-  const subtotal = cart.reduce(
-    (acc, item) => acc + getItemPrice(item) * (item.quantity || 1),
-    0,
-  );
-  const total = subtotal + shippingCost;
+  const subtotal = cartSubtotal;
+  const total = cartSubtotal + shippingCost;
 
   return (
     <section className="pb-35 pt-10">
@@ -83,7 +87,7 @@ const Cart = () => {
                 {/* Price / Quantity / Subtotal */}
                 <div className="flex flex-col md:flex-row justify-between w-full md:w-[70%] mt-4 md:mt-0 items-start md:items-center gap-4 md:gap-6">
                   <div className="text-base font-poppins font-normal leading-6 text-black">
-                    ${getItemPrice(item)}
+                    ৳{getItemPrice(item)}
                   </div>
 
                   {/* Quantity */}
@@ -100,7 +104,7 @@ const Cart = () => {
                   </div>
 
                   <div className="text-base font-poppins font-normal leading-6 text-black text-end">
-                    ${getItemPrice(item) * (item.quantity || 1)}
+                    ৳{getItemPrice(item) * (item.quantity || 1)}
                   </div>
                 </div>
               </div>
@@ -112,24 +116,24 @@ const Cart = () => {
         <div className="flex flex-col lg:flex-row justify-between gap-10 mt-12">
           <div className="flex flex-col gap-6 w-full lg:w-1/2">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-4">
-              <button className="px-12 py-4 bg-transparent border border-black/50 text-black font-poppins font-medium text-base leading-6 rounded-sm w-full sm:w-auto">
+              <Link
+                to="/shop"
+                className="px-12 py-4 bg-transparent border border-black/50 text-black font-poppins font-medium text-base leading-6 rounded-sm w-full sm:w-auto text-center"
+              >
                 Return To Shop
-              </button>
-              <button className="px-12 py-4 bg-transparent border border-black/50 text-black font-poppins font-medium text-base leading-6 rounded-sm w-full sm:w-auto">
-                Update Cart
+              </Link>
+              <button
+                type="button"
+                onClick={clearCart}
+                className="px-12 py-4 bg-transparent border border-black/50 text-black font-poppins font-medium text-base leading-6 rounded-sm w-full sm:w-auto"
+              >
+                Clear Cart
               </button>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <input
-                type="text"
-                placeholder="Coupon code"
-                className="w-full sm:w-[60%] rounded-sm border border-black py-4 px-6 focus:outline-none"
-              />
-              <button className="px-12 py-4 bg-[#DB4444] text-[#fafafa] font-poppins font-medium text-base leading-6 rounded-sm w-full sm:w-auto">
-                Apply Coupon
-              </button>
-            </div>
+            <p className="text-sm text-gray-500">
+              Coupon codes can be entered at checkout.
+            </p>
           </div>
 
           <div className="w-full lg:w-[35%]">
@@ -143,7 +147,7 @@ const Cart = () => {
                     Subtotal:
                   </span>
                   <span className="font-poppins font-normal text-base text-black leading-6">
-                    ${subtotal}
+                    ৳{subtotal}
                   </span>
                 </div>
                 <div className="flex justify-between mb-4 pb-4 border-b border-black/40">
@@ -151,7 +155,7 @@ const Cart = () => {
                     Shipping:
                   </span>
                   <span className="font-poppins font-normal text-base text-black leading-6">
-                    ${shippingCost}
+                    ৳{shippingCost}
                   </span>
                 </div>
                 <div className="flex justify-between font-bold text-lg mb-4">
@@ -159,7 +163,7 @@ const Cart = () => {
                     Total
                   </span>
                   <span className="font-poppins font-normal text-base text-black leading-6">
-                    ${total}
+                    ৳{total}
                   </span>
                 </div>
                 <Link

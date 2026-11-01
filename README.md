@@ -1,63 +1,27 @@
-# E-commerce React + Vite App
+# SingleV E-commerce Frontend
 
-This is a modern e-commerce application built with React and Vite, using Firebase for authentication and TailwindCSS for styling.
+The React/Vite storefront uses the Express/MongoDB API for authentication,
+catalog data, cart operations, and orders.
 
-## Getting Started
+## Requirements
 
-### Prerequisites
+- Node.js 20.19 or newer
+- The backend running on port 5000
+- MongoDB configured for the backend
 
-- Node.js (v18 or higher recommended)
-- Firebase account and project
+## Development
 
-### Installation
+1. Install frontend dependencies with `npm install`.
+2. Configure and start the backend using `backend/.env.example`.
+3. Copy `.env.example` to `.env` if you need to set a custom API URL. For local
+   development, the default `/api/v1` URL is proxied to `http://localhost:5000`.
+4. Start the frontend with `npm run dev`.
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd <project-name>
-   ```
+## Production
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+Set `VITE_API_URL` to the backend API URL ending in `/api/v1`, for example
+`https://api.example.com/api/v1`. Configure the backend `CORS_ORIGIN` as the
+exact storefront origin. The backend must use production JWT and cookie secrets
+that are at least 32 characters long.
 
-3. Configure Environment Variables:
-   - Copy `.env.example` to `.env`:
-     ```bash
-     cp .env.example .env
-     ```
-   - Update `.env` with your Firebase configuration keys.
-
-### Development
-
-To start the development server:
-```bash
-npm run dev
-```
-
-### Production Build
-
-To build the application for production:
-```bash
-npm run build
-```
-
-To preview the production build locally:
-```bash
-npm run preview
-```
-
-## Deployment on Vercel
-
-1. **Push to GitHub**: Make sure your code is pushed to a GitHub repository.
-2. **Connect to Vercel**: create a new project on Vercel and import your repository.
-3. **Environment Variables**: In the Vercel dashboard for your project, go to **Settings > Environment Variables** and add all variables from your `.env` file (e.g., `VITE_FIREBASE_API_KEY`, etc.).
-4. **Deploy**: Vercel will automatically detect Vite and build your project.
-
-## Features
-
-- User Authentication (Firebase)
-- Product browsing and filtering
-- Shopping Cart and Wishlist
-- Responsive Design (TailwindCSS)
+Build and preview with `npm run build` and `npm run preview`.

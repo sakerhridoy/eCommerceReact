@@ -4,6 +4,8 @@ import signupImg from '../../assets/images/signup.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import Swal from 'sweetalert2';
+import { useGoogleLogin } from '@react-oauth/google';
+import api from '../../api/client';
 
 const SignUp = () => {
   const { signup } = useAuth();
@@ -16,11 +18,56 @@ const SignUp = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError('');
   };
+
+  // ================= Google Signup/Login Logic =================
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async tokenResponse => {
+      setGoogleLoading(true);
+      try {
+        const { data } = await api.post('/auth/google', {
+          token: tokenResponse.access_token,
+        });
+        
+        localStorage.setItem('token', data.data.token);
+
+        await Swal.fire({
+          title: 'Success!',
+          text: 'Google Authentication Successful!',
+          icon: 'success',
+          confirmButtonColor: '#DB4444',
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+
+        window.location.href = '/';
+      } catch (err) {
+        Swal.fire({
+          title: 'Error',
+          text: err.response?.data?.message || 'Google authentication failed',
+          icon: 'error',
+          confirmButtonColor: '#DB4444',
+        });
+      } finally {
+        setGoogleLoading(false);
+      }
+    },
+    onError: error => {
+      console.error('Google Login Error:', error);
+      Swal.fire({
+        title: 'Error',
+        text: 'Could not connect to Google.',
+        icon: 'error',
+        confirmButtonColor: '#DB4444',
+      });
+    },
+  });
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -51,7 +98,7 @@ const SignUp = () => {
         showConfirmButton: true,
       });
 
-      navigate('/login');
+      navigate('/');
     } catch (err) {
       Swal.fire({
         title: 'Error',
@@ -68,7 +115,6 @@ const SignUp = () => {
 
   return (
     <section className="relative pt-10 md:pt-19 pb-25 md:pb-35 px-4 lg:px-0">
-      {/* IMAGE (DESKTOP ONLY) */}
       <div className="hidden lg:flex w-1/2">
         <img
           src={signupImg}
@@ -93,7 +139,7 @@ const SignUp = () => {
                 value={form.name}
                 onChange={handleChange}
                 className="w-full border-b outline-none"
-                disabled={loading}
+                disabled={loading || googleLoading}
               />
               <input
                 name="email"
@@ -101,7 +147,7 @@ const SignUp = () => {
                 value={form.email}
                 onChange={handleChange}
                 className="w-full border-b outline-none"
-                disabled={loading}
+                disabled={loading || googleLoading}
               />
               <input
                 name="password"
@@ -110,14 +156,14 @@ const SignUp = () => {
                 value={form.password}
                 onChange={handleChange}
                 className="w-full border-b outline-none"
-                disabled={loading}
+                disabled={loading || googleLoading}
               />
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || googleLoading}
                 className={`w-full bg-[#DB4444] py-4 text-white font-medium font-poppins rounded-sm transition ${
-                  loading
+                  loading || googleLoading
                     ? 'opacity-70 cursor-not-allowed'
                     : 'hover:bg-[#c0392b]'
                 }`}
@@ -127,10 +173,18 @@ const SignUp = () => {
 
               <button
                 type="button"
-                className="w-full border border-black/20 py-4 flex items-center justify-center gap-2 font-normal text-base rounded-sm shadow-lg"
-                disabled={loading}
+                onClick={() => handleGoogleLogin()}
+                disabled={loading || googleLoading}
+                className={`w-full border border-black/20 py-4 flex items-center justify-center gap-2 font-normal text-base rounded-sm shadow-sm transition ${
+                  loading || googleLoading
+                    ? 'opacity-70 cursor-not-allowed'
+                    : 'hover:bg-gray-50'
+                }`}
               >
-                <FcGoogle className="text-2xl" /> Sign up with Google
+                <FcGoogle className="text-2xl" />
+                {googleLoading
+                  ? 'Connecting to Google...'
+                  : 'Sign up with Google'}
               </button>
             </form>
 

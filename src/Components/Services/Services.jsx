@@ -31,7 +31,7 @@ const Services = ({ className = '' }) => {
                   FREE AND FAST DELIVERY
                 </h4>
                 <p className="font-poppins text-sm lg:text-xs xl:text-sm text-black">
-                  Free delivery for all orders over $140
+                  Free delivery for all orders over ৳140
                 </p>
               </div>
             </div>

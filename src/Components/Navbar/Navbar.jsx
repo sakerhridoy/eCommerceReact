@@ -9,14 +9,18 @@ import { TbLogout2 } from 'react-icons/tb';
 import { RxHamburgerMenu } from 'react-icons/rx';
 import logo from '../../assets/images/logo.png';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useShop } from '../../contexts/ShopContext';
-import axios from 'axios';
+import useShopStore from '../../store/cartStore';
 import { useAuth } from '../../contexts/AuthContext';
+import { getProducts } from '../../api/catalog';
+import { useTranslation } from 'react-i18next';
 
 const Navbar = () => {
+  const { t, i18n } = useTranslation();
+
   const location = useLocation();
   const navigate = useNavigate();
-  const { cart, wishlist } = useShop();
+  const cartCount = useShopStore(state => state.cartCount);
+  const wishlistCount = useShopStore(state => state.wishlistCount);
   const { user, logout } = useAuth();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,19 +29,12 @@ const Navbar = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [mobileLangOpen, setMobileLangOpen] = useState(false);
-  const [language, setLanguage] = useState('English'); // selected language
+  const [language, setLanguage] = useState(i18n.language || 'en');
 
   const dropdownRef = useRef(null);
   const hideIcons =
     location.pathname === '/login' || location.pathname === '/signup';
 
-  const cartCount = cart.reduce(
-    (total, item) => total + (item.quantity || 1),
-    0,
-  );
-  const wishlistCount = wishlist.length;
-
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = event => {
       if (
@@ -55,23 +52,19 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showAcc, mobileLangOpen]);
 
-  // Mobile menu scroll lock
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? 'hidden' : 'auto';
   }, [isMenuOpen]);
 
-  // Live search dropdown
   useEffect(() => {
     if (!search.trim()) return setResults([]);
 
     const timer = setTimeout(async () => {
       try {
         setLoading(true);
-        const res = await axios.get(
-          `https://dummyjson.com/products/search?q=${search}`,
-        );
-        setResults(res.data.products.slice(0, 5));
-      } catch {
+        setResults(await getProducts({ search, limit: 5 }));
+      } catch (error) {
+        console.error('Product search failed:', error);
         setResults([]);
       } finally {
         setLoading(false);
@@ -91,45 +84,55 @@ const Navbar = () => {
   };
 
   const handleLogout = async () => {
-    await logout();
-    setShowAcc(false);
-    setIsMenuOpen(false);
-    navigate('/login');
+    try {
+      await logout();
+      setShowAcc(false);
+      setIsMenuOpen(false);
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   const closeMenu = () => setIsMenuOpen(false);
 
+  const handleLanguageChange = selectedLang => {
+    setLanguage(selectedLang);
+    i18n.changeLanguage(selectedLang);
+  };
+
   return (
     <nav className="border-b border-gray-200/70 bg-white sticky top-0 z-50">
+      {/* Top Black Bar */}
       <div className="bg-black py-2.5 text-white text-[10px] sm:text-sm px-4 lg:px-0">
         <div className="container flex justify-end-safe gap-20 lg:gap-67.5 items-center">
           <p className="">
             <span className="hidden md:inline-block">
-              Summer Sale For All Swim Suits And
+              {t('Summer Sale For All Swim Suits And')}
             </span>{' '}
-            Free ExpressDelivery - OFF 50%!
+            {t('Free ExpressDelivery - OFF 50%!')}
             <Link to="/shop" className="underline ps-2 sm:ps-4">
-              ShopNow
+              {t('ShopNow')}
             </Link>
           </p>
 
-          {/* Desktop Language Selector */}
+          {/* Desktop Language Select */}
           <div className="hidden sm:block">
             <select
               value={language}
-              onChange={e => setLanguage(e.target.value)}
-              className="text-white bg-black outline-none px-2 py-1 rounded"
+              onChange={e => handleLanguageChange(e.target.value)}
+              className="text-white bg-black outline-none px-2 py-1 rounded cursor-pointer"
             >
-              <option value="English" className="bg-black text-white">
+              <option value="en" className="bg-black text-white">
                 English
               </option>
-              <option value="Bangla" className="bg-black text-white">
+              <option value="bn" className="bg-black text-white">
                 Bangla
               </option>
             </select>
           </div>
 
-          {/* Mobile Language Icon */}
+          {/* Mobile Language Button */}
           <div className="sm:hidden relative">
             <button
               id="mobile-lang-btn"
@@ -141,16 +144,19 @@ const Navbar = () => {
             {mobileLangOpen && (
               <div className="absolute right-0 mt-2 w-32 bg-white text-black rounded shadow-lg z-50">
                 <ul>
-                  {['English', 'Bangla'].map(lang => (
+                  {[
+                    { code: 'en', label: 'English' },
+                    { code: 'bn', label: 'Bangla' },
+                  ].map(lang => (
                     <li
-                      key={lang}
+                      key={lang.code}
                       className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
                       onClick={() => {
-                        setLanguage(lang);
+                        handleLanguageChange(lang.code);
                         setMobileLangOpen(false);
                       }}
                     >
-                      {lang}
+                      {lang.label}
                     </li>
                   ))}
                 </ul>
@@ -160,44 +166,42 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Main Navbar */}
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between py-4 lg:py-5">
-          {/* Logo */}
           <Link to="/" onClick={closeMenu}>
             <img src={logo} alt="Logo" className="h-9 xl:h-10 w-auto" />
           </Link>
 
-          {/* Desktop Menu */}
           <ul className="hidden lg:flex items-center gap-9 text-[12px] xl:text-base font-medium text-gray-800">
             <li>
               <Link to="/" onClick={closeMenu}>
-                Home
+                {t('home')}
               </Link>
             </li>
             <li>
               <Link to="/shop" onClick={closeMenu}>
-                Shop
+                {t('shop')}
               </Link>
             </li>
             <li>
               <Link to="/contact" onClick={closeMenu}>
-                Contact
+                {t('contact')}
               </Link>
             </li>
             <li>
               <Link to="/about" onClick={closeMenu}>
-                About
+                {t('about')}
               </Link>
             </li>
             {!user && (
               <li>
                 <Link to="/signup" onClick={closeMenu}>
-                  Sign Up
+                  {t('signUp')}
                 </Link>
               </li>
             )}
           </ul>
+
           <div className="flex items-center gap-4 lg:gap-4 xl:gap-6">
             <form
               onSubmit={handleSearchSubmit}
@@ -208,7 +212,7 @@ const Navbar = () => {
                   type="text"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  placeholder="What are you looking for?"
+                  placeholder={t('searchPlaceholder')}
                   className="w-full bg-transparent outline-none text-sm"
                 />
                 <button type="submit">
@@ -218,7 +222,7 @@ const Navbar = () => {
               {search && (
                 <div className="absolute top-full left-0 w-full bg-white shadow-lg z-50 rounded mt-1">
                   {loading ? (
-                    <p className="p-3 text-sm">Searching...</p>
+                    <p className="p-3 text-sm">{t('searching')}</p>
                   ) : results.length > 0 ? (
                     results.map(item => (
                       <div
@@ -230,7 +234,7 @@ const Navbar = () => {
                         className="flex gap-3 items-center p-3 hover:bg-gray-100 cursor-pointer"
                       >
                         <img
-                          src={item.thumbnail}
+                          src={item.img}
                           className="w-10 h-10 object-contain"
                           alt={item.title}
                         />
@@ -238,7 +242,9 @@ const Navbar = () => {
                       </div>
                     ))
                   ) : (
-                    <p className="p-3 text-sm text-gray-500">No result found</p>
+                    <p className="p-3 text-sm text-gray-500">
+                      {t('noResultFound')}
+                    </p>
                   )}
                 </div>
               )}
@@ -246,7 +252,6 @@ const Navbar = () => {
 
             {!hideIcons && (
               <div className="flex items-center gap-5 lg:gap-7 text-xl text-gray-800">
-                {/* Wishlist */}
                 <div className="relative">
                   <Link
                     to="/wishlist"
@@ -260,7 +265,6 @@ const Navbar = () => {
                     </span>
                   )}
                 </div>
-                {/* Cart */}
                 <div className="relative">
                   <Link
                     to="/cart"
@@ -274,7 +278,8 @@ const Navbar = () => {
                     </span>
                   )}
                 </div>
-                {/* User Dropdown */}
+
+                {/* USER DROPDOWN */}
                 <div className="relative" ref={dropdownRef}>
                   <div
                     onClick={() => setShowAcc(!showAcc)}
@@ -294,27 +299,62 @@ const Navbar = () => {
                               onClick={() => setShowAcc(false)}
                               className="flex items-center gap-3"
                             >
-                              <LuUser /> Manage My Account
+                              <LuUser /> {t('Manage My Account')}
                             </Link>
                           </li>
-                          <li className="flex items-center gap-3 cursor-pointer">
-                            <LuShoppingBag /> My Orders
+                          {user?.role === 'admin' && (
+                            <li>
+                              <Link
+                                to="/admin"
+                                onClick={() => setShowAcc(false)}
+                                className="flex items-center gap-3"
+                              >
+                                <LuUser /> {t('Admin Dashboard')}
+                              </Link>
+                            </li>
+                          )}
+                          <li>
+                            <Link
+                              to={
+                                user?.role === 'admin'
+                                  ? '/admin/orders'
+                                  : '/my-orders'
+                              }
+                              onClick={() => setShowAcc(false)}
+                              className="flex items-center gap-3"
+                            >
+                              <LuShoppingBag /> {t('My Orders')}
+                            </Link>
                           </li>
-                          <li className="flex items-center gap-3 cursor-pointer">
-                            <LuStar /> My Reviews
+                          {/* === Dynamic Reviews Link (Desktop) === */}
+                          <li>
+                            <Link
+                              to={
+                                user?.role === 'admin'
+                                  ? '/admin/reviews'
+                                  : '/my-reviews'
+                              }
+                              onClick={() => setShowAcc(false)}
+                              className="flex items-center gap-3"
+                            >
+                              <LuStar />{' '}
+                              {user?.role === 'admin'
+                                ? t('All Reviews')
+                                : t('My Reviews')}
+                            </Link>
                           </li>
                           <li
                             onClick={handleLogout}
                             className="flex items-center gap-3 cursor-pointer"
                           >
-                            <TbLogout2 /> Logout
+                            <TbLogout2 /> {t('logout')}
                           </li>
                         </>
                       ) : (
                         <>
                           <li>
                             <Link to="/login" onClick={() => setShowAcc(false)}>
-                              Login
+                              {t('login')}
                             </Link>
                           </li>
                           <li>
@@ -322,7 +362,7 @@ const Navbar = () => {
                               to="/signup"
                               onClick={() => setShowAcc(false)}
                             >
-                              Sign Up
+                              {t('signUp')}
                             </Link>
                           </li>
                         </>
@@ -330,11 +370,10 @@ const Navbar = () => {
                     </ul>
                   </div>
                 </div>
-                {/* Mobile Hamburger */}
+
                 <button
                   className="lg:hidden text-2xl p-1 -mr-1"
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  aria-label="Toggle menu"
                 >
                   <RxHamburgerMenu />
                 </button>
@@ -345,7 +384,6 @@ const Navbar = () => {
               <button
                 className="lg:hidden text-2xl text-gray-800 p-1"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                aria-label="Toggle menu"
               >
                 <RxHamburgerMenu />
               </button>
@@ -353,7 +391,7 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* MOBILE MENU */}
         <div
           className={`lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
           onClick={closeMenu}
@@ -369,47 +407,77 @@ const Navbar = () => {
                 onClick={closeMenu}
               />
             </div>
-
-            {/* Mobile Menu Links */}
             <ul className="flex flex-col px-4 py-6 gap-6">
               <li>
                 <Link to="/" onClick={closeMenu}>
-                  Home
+                  {t('home')}
                 </Link>
               </li>
               <li>
                 <Link to="/shop" onClick={closeMenu}>
-                  Shop
+                  {t('shop')}
                 </Link>
               </li>
               <li>
                 <Link to="/contact" onClick={closeMenu}>
-                  Contact
+                  {t('contact')}
                 </Link>
               </li>
               <li>
                 <Link to="/about" onClick={closeMenu}>
-                  About
+                  {t('about')}
                 </Link>
               </li>
+
               {!user && (
                 <li>
                   <Link to="/signup" onClick={closeMenu}>
-                    Sign Up
+                    {t('signUp')}
                   </Link>
                 </li>
               )}
+
               {user && (
                 <>
                   <li>
                     <Link to="/myAccount" onClick={closeMenu}>
-                      My Account
+                      {t('manageMyAccount')}
                     </Link>
                   </li>
-                  <li>My Orders</li>
-                  <li>My Reviews</li>
+                  {user?.role === 'admin' && (
+                    <li>
+                      <Link to="/admin" onClick={closeMenu}>
+                        {t('adminDashboard')}
+                      </Link>
+                    </li>
+                  )}
+                  <li>
+                    <Link
+                      to={
+                        user?.role === 'admin' ? '/admin/orders' : '/my-orders'
+                      }
+                      onClick={closeMenu}
+                    >
+                      {t('myOrders')}
+                    </Link>
+                  </li>
+                  {/* === Dynamic Reviews Link (Mobile) === */}
+                  <li>
+                    <Link
+                      to={
+                        user?.role === 'admin'
+                          ? '/admin/reviews'
+                          : '/my-reviews'
+                      }
+                      onClick={closeMenu}
+                    >
+                      {user?.role === 'admin'
+                        ? t('allReviews')
+                        : t('myReviews')}
+                    </Link>
+                  </li>
                   <li onClick={handleLogout} className="cursor-pointer">
-                    Logout
+                    {t('logout')}
                   </li>
                 </>
               )}

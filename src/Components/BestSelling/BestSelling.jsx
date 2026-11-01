@@ -1,59 +1,30 @@
-import React from 'react';
-import bestSelling from '../../assets/images/bestSelling.png';
-import bSelling2 from '../../assets/images/bSelling2.png';
-import bSelling3 from '../../assets/images/bSelling3.png';
-import bSelling4 from '../../assets/images/bSelling4.png';
+import React, { useEffect, useState } from 'react';
 import { FaStar, FaStarHalfAlt, FaRegHeart } from 'react-icons/fa';
 import { IoEyeOutline } from 'react-icons/io5';
 import { useShop } from '../../contexts/ShopContext';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
+import { getHomeData } from '../../api/catalog';
 
 const BestSelling = () => {
-  const bestSellingItems = [
-    {
-      id: 1,
-      name: 'The north coat',
-      price: 260,
-      oldPrice: 360,
-      rating: 5,
-      reviews: 65,
-      img: bestSelling,
-    },
-    {
-      id: 2,
-      name: 'Gucci duffle bag',
-      price: 960,
-      oldPrice: 1160,
-      rating: 4.5,
-      reviews: 65,
-      img: bSelling2,
-    },
-    {
-      id: 3,
-      name: 'RGB liquid CPU Cooler',
-      price: 160,
-      oldPrice: 170,
-      rating: 4.5,
-      reviews: 65,
-      img: bSelling3,
-    },
-    {
-      id: 4,
-      name: 'Small BookSelf',
-      price: 260,
-      oldPrice: 360,
-      rating: 5,
-      reviews: 65,
-      img: bSelling4,
-    },
-  ];
+  const [bestSellingItems, setBestSellingItems] = useState([]);
+  const { addToWishlist, wishlist, removeFromWishlist, addToCart } = useShop();
 
-  const { addToWishlist, wishlist, removeFromWishlist } = useShop();
+  useEffect(() => {
+    let active = true;
+    getHomeData()
+      .then(data => {
+        if (active) setBestSellingItems(data.bestSellers);
+      })
+      .catch(error => console.error('Failed to load best sellers:', error));
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const renderStars = rating => {
     const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
+    const fullStars = Math.floor(rating || 4);
+    const hasHalfStar = (rating || 4) % 1 !== 0;
 
     for (let i = 0; i < fullStars; i++) {
       stars.push(<FaStar key={`full-${i}`} className="text-[#FFAD33]" />);
@@ -77,7 +48,6 @@ const BestSelling = () => {
               </h4>
             </div>
 
-            {/* Responsive header (UI same) */}
             <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
               <h2 className="font-inter font-semibold text-4xl text-black">
                 Best Selling Products
@@ -93,7 +63,6 @@ const BestSelling = () => {
           </div>
         </div>
 
-        {/* RESPONSIVE GRID */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7.5 pb-20 lg:pb-35">
           {bestSellingItems.map(item => {
             const isWished = wishlist.some(w => w.id === item.id);
@@ -102,63 +71,138 @@ const BestSelling = () => {
               isWished ? removeFromWishlist(item.id) : addToWishlist(item);
             };
 
+            const isOutOfStock = item.stock <= 0;
+
+            let discountPercentage = 0;
+            if (item.mPrice && item.dPrice && item.mPrice > item.dPrice) {
+              discountPercentage = Math.round(
+                ((item.mPrice - item.dPrice) / item.mPrice) * 100,
+              );
+            } else if (item.discountPercentage) {
+              discountPercentage = Math.round(item.discountPercentage);
+            } else if (item.dis) {
+              discountPercentage = item.dis;
+            }
+
             return (
-              <div key={item.id} className="item">
-                <div className="bg-[#F5F5F5] py-8.75 rounded-sm relative">
-                  <Link to={`/product/${item.id}`}>
-                    <img className="mx-auto w-43" src={item.img} alt="" />
+              <div
+                key={item.id || item._id}
+                className="item group flex flex-col justify-between"
+              >
+                <div
+                  className={`bg-[#F5F5F5] py-8.75 rounded-sm relative overflow-hidden flex items-center justify-center h-64 ${isOutOfStock ? 'opacity-60' : ''}`}
+                >
+                  <Link
+                    to={isOutOfStock ? '#' : `/product/${item.id || item._id}`}
+                    onClick={e => isOutOfStock && e.preventDefault()}
+                    className={`w-full h-full flex items-center justify-center p-4 ${isOutOfStock ? 'cursor-not-allowed' : ''}`}
+                  >
+                    <img
+                      className={`max-h-full max-w-full object-contain duration-300 ${!isOutOfStock && 'group-hover:scale-90'}`}
+                      src={item.img || item.thumbnail || item.image || null}
+                      alt={item.name || item.title || 'Product'}
+                      onError={e => {
+                        e.target.onerror = null;
+                        e.target.src =
+                          'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400';
+                      }}
+                    />
                   </Link>
 
-                  <div className="absolute top-3 right-3 px-3">
-                    <button
-                      onClick={handleToggleWishlist}
-                      className="bg-white p-1.25 rounded-full cursor-pointer mb-2"
-                    >
-                      <FaRegHeart
-                        className={`text-base ${
-                          isWished ? 'text-red-500' : 'text-black'
-                        }`}
-                      />
-                    </button>
+                  {isOutOfStock ? (
+                    <div className="absolute top-3 left-3 bg-gray-800 px-3 py-1 rounded-sm z-10">
+                      <p className="text-xs text-white font-poppins">
+                        Out of Stock
+                      </p>
+                    </div>
+                  ) : discountPercentage > 0 ? (
+                    <div className="absolute top-3 left-3 bg-[#DB4444] px-3 py-1 rounded-sm z-10">
+                      <p className="text-xs text-white font-poppins">
+                        - {discountPercentage}%
+                      </p>
+                    </div>
+                  ) : null}
 
-                    <Link
-                      to={`/product/${item.id}`}
-                      className="bg-white p-1.25 rounded-full flex items-center justify-center"
+                  {!isOutOfStock && (
+                    <div className="absolute top-3 right-3 px-3 flex flex-col gap-2 z-10">
+                      <button
+                        onClick={handleToggleWishlist}
+                        className="bg-white p-2 rounded-full cursor-pointer shadow-sm hover:text-[#DB4444] transition-colors"
+                      >
+                        <FaRegHeart
+                          className={`text-base ${
+                            isWished ? 'text-red-500' : 'text-black'
+                          }`}
+                        />
+                      </button>
+
+                      <Link
+                        to={`/product/${item.id || item._id}`}
+                        className="bg-white p-2 rounded-full flex items-center justify-center shadow-sm hover:text-[#DB4444] transition-colors"
+                      >
+                        <IoEyeOutline className="text-base text-black hover:text-[#DB4444] transition-colors" />
+                      </Link>
+                    </div>
+                  )}
+
+                  {!isOutOfStock && (
+                    <div
+                      onClick={() => addToCart(item)}
+                      className="absolute left-0 -bottom-11.25 w-full bg-black text-white text-center py-2
+                      cursor-pointer opacity-0 group-hover:bottom-0 group-hover:opacity-100 transition-all z-10 font-medium font-poppins"
                     >
-                      <IoEyeOutline className="text-base text-black" />
-                    </Link>
-                  </div>
+                      Add To Cart
+                    </div>
+                  )}
                 </div>
 
-                <Link to={`/product/${item.id}`}>
-                  <div className="pt-4">
-                    <h3 className="font-poppins font-medium text-base text-black">
-                      {item.name}
+                <div className={`pt-4 ${isOutOfStock ? 'opacity-60' : ''}`}>
+                  <Link
+                    to={isOutOfStock ? '#' : `/product/${item.id || item._id}`}
+                    onClick={e => isOutOfStock && e.preventDefault()}
+                    className={
+                      isOutOfStock
+                        ? 'cursor-not-allowed'
+                        : 'hover:text-[#DB4444] transition-colors'
+                    }
+                  >
+                    <h3 className="font-poppins font-medium text-base text-black line-clamp-1 transition-colors">
+                      {item.name || item.title}
                     </h3>
+                  </Link>
 
-                    <p className="py-2 font-poppins font-medium text-base flex items-center gap-3">
-                      <span className="text-[#DB4444]">${item.price}</span>
-                      <del className="text-[rgba(0,0,0,0.5)]">
-                        ${item.oldPrice}
+                  <p className="py-2 font-poppins font-medium text-base flex items-center gap-3 flex-wrap">
+                    <span className="text-[#DB4444]">
+                      ৳{item.dPrice || item.price}
+                    </span>
+
+                    {discountPercentage > 0 && (item.mPrice || item.price) && (
+                      <del className="text-[rgba(0,0,0,0.5)] text-sm">
+                        ৳
+                        {item.mPrice ||
+                          (item.price / (1 - discountPercentage / 100)).toFixed(
+                            2,
+                          )}
                       </del>
-                    </p>
+                    )}
+                  </p>
 
-                    <div className="flex items-center gap-1">
-                      {renderStars(item.rating)}
-                      <span className="font-poppins font-semibold text-sm text-[rgba(0,0,0,0.5)] ps-1">
-                        ({item.reviews})
-                      </span>
-                    </div>
+                  <div className="flex items-center gap-1">
+                    {renderStars(item.ratingStars || item.rating)}
+                    <span className="font-poppins font-semibold text-sm text-[rgba(0,0,0,0.5)] ps-1 mt-0.5">
+                      ({item.rating || 35})
+                    </span>
                   </div>
-                </Link>
+                </div>
               </div>
             );
           })}
         </div>
-        <div className="block lg:hidden pb-15">
+
+        <div className="block lg:hidden pb-15 text-center">
           <Link
             to="/shop"
-            className="bg-[#DB4444] hover:bg-[#b80808] transition-all duration-300 text-center py-4 px-12 rounded-sm font-poppins font-medium text-base text-[#fafafa] w-max"
+            className="bg-[#DB4444] hover:bg-[#b80808] transition-all duration-300 inline-block py-4 px-12 rounded-sm font-poppins font-medium text-base text-[#fafafa]"
           >
             View All
           </Link>
