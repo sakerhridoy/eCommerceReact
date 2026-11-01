@@ -47,10 +47,17 @@ const Category = () => {
       setLoading(true);
       try {
         const res = await getProducts({ category });
-        setProducts(Array.isArray(res) ? res : res.products || []);
+        setProducts(
+          Array.isArray(res)
+            ? res
+            : Array.isArray(res?.products)
+              ? res.products
+              : [],
+        );
       } catch (err) {
         console.error('Failed to load category products:', err);
         setError('Failed to load products');
+        setProducts([]);
       } finally {
         setLoading(false);
       }

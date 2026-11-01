@@ -22,13 +22,18 @@ const FlashSales = () => {
     let active = true;
     getHomeData()
       .then(data => {
-        if (active) setFlashItems(data.discountProducts);
+        if (active) {
+          setFlashItems(
+            Array.isArray(data?.discountProducts) ? data.discountProducts : [],
+          );
+        }
       })
       .catch(error => console.error('Failed to load sale products:', error));
     return () => {
       active = false;
     };
   }, []);
+  const safeFlashItems = Array.isArray(flashItems) ? flashItems : [];
 
   return (
     <section className="pt-10 lg:pt-24 mx-4 xl:mx-0">
@@ -107,7 +112,7 @@ const FlashSales = () => {
             },
           }}
         >
-          {flashItems.map(item => {
+          {safeFlashItems.map(item => {
             const isWished = wishlist.some(w => w.id === item.id);
 
             const isOutOfStock = item.stock <= 0;

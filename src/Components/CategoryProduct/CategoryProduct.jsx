@@ -16,10 +16,10 @@ const CategoryProduct = () => {
       try {
         const category = await getCategoryBySlug(slug);
         const products = await getProducts({
-          category: category._id,
+          category: category?._id,
           limit: 100,
         });
-        if (active) setCateProducts(products);
+        if (active) setCateProducts(Array.isArray(products) ? products : []);
       } catch (error) {
         console.error('Failed to load category products:', error);
         if (active) setCateProducts([]);
@@ -32,6 +32,7 @@ const CategoryProduct = () => {
   }, [slug]);
 
   const [visibleCount, setVisibleCount] = useState(4);
+  const safeCateProducts = Array.isArray(cateProducts) ? cateProducts : [];
 
   return (
     <section className="pt-8">
@@ -46,7 +47,7 @@ const CategoryProduct = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 pb-19 gap-x-7.5 gap-y-15">
-          {cateProducts.slice(0, visibleCount).map((product, index) => {
+          {safeCateProducts.slice(0, visibleCount).map((product, index) => {
             const isOutOfStock = product.stock <= 0;
             const discountAmount = product.discountPercentage
               ? Math.round(product.discountPercentage)
@@ -173,7 +174,7 @@ const CategoryProduct = () => {
           })}
         </div>
 
-        {visibleCount < cateProducts.length && (
+        {visibleCount < safeCateProducts.length && (
           <div className="pb-22.75 text-center">
             <button
               onClick={() => setVisibleCount(visibleCount + 4)}

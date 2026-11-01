@@ -48,7 +48,8 @@ const Banner = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        setCategories(await getCategories());
+        const items = await getCategories();
+        setCategories(Array.isArray(items) ? items : []);
       } catch (err) {
         setCategories([]);
         setError('Failed to load categories');

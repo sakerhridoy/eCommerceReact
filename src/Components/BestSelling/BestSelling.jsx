@@ -13,13 +13,20 @@ const BestSelling = () => {
     let active = true;
     getHomeData()
       .then(data => {
-        if (active) setBestSellingItems(data.bestSellers);
+        if (active) {
+          setBestSellingItems(
+            Array.isArray(data?.bestSellers) ? data.bestSellers : [],
+          );
+        }
       })
       .catch(error => console.error('Failed to load best sellers:', error));
     return () => {
       active = false;
     };
   }, []);
+  const safeBestSellingItems = Array.isArray(bestSellingItems)
+    ? bestSellingItems
+    : [];
 
   const renderStars = rating => {
     const stars = [];
@@ -64,7 +71,7 @@ const BestSelling = () => {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7.5 pb-20 lg:pb-35">
-          {bestSellingItems.map(item => {
+          {safeBestSellingItems.map(item => {
             const isWished = wishlist.some(w => w.id === item.id);
 
             const handleToggleWishlist = () => {

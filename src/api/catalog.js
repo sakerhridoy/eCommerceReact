@@ -1,5 +1,32 @@
 import api from './client';
 
+const getResponseData = response => {
+  let payload = response?.data ?? response;
+
+  while (
+    payload &&
+    !Array.isArray(payload) &&
+    typeof payload === 'object' &&
+    payload.data !== undefined
+  ) {
+    payload = payload.data;
+  }
+
+  return payload;
+};
+
+const getCollection = (payload, key) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.[key])) return payload[key];
+  if (
+    (key === 'products' || key === 'categories') &&
+    Array.isArray(payload?.items)
+  ) {
+    return payload.items;
+  }
+  return [];
+};
+
 const getImageUrl = image => {
   if (!image) return '';
   const rawPath = typeof image === 'string' ? image : image?.url || '';
@@ -22,68 +49,81 @@ const getImageUrl = image => {
 };
 
 export const normalizeProduct = product => {
+  const safeProduct = product || {};
   const thumbnail =
-    getImageUrl(product.thumbnail) ||
-    getImageUrl(product.images?.[0]) ||
-    getImageUrl(product.img) ||
-    getImageUrl(product.image) ||
+    getImageUrl(safeProduct.thumbnail) ||
+    getImageUrl(Array.isArray(safeProduct.images) && safeProduct.images[0]) ||
+    getImageUrl(safeProduct.img) ||
+    getImageUrl(safeProduct.image) ||
     '';
-  const price = Number(product.price || 0);
-  const discountPrice = Number(product.discountPrice ?? price);
+  const price = Number(safeProduct.price || 0);
+  const discountPrice = Number(safeProduct.discountPrice ?? price);
 
   return {
-    ...product,
-    id: String(product._id || product.id),
-    name: product.title || product.name || 'Product',
-    title: product.title || product.name || 'Product',
+    ...safeProduct,
+    id: String(safeProduct._id || safeProduct.id || ''),
+    name: safeProduct.title || safeProduct.name || 'Product',
+    title: safeProduct.title || safeProduct.name || 'Product',
     img: thumbnail,
     thumbnail,
     images:
-      product.images?.map(getImageUrl).filter(Boolean) ||
-      (thumbnail ? [thumbnail] : []),
+      Array.isArray(safeProduct.images) && safeProduct.images.length
+        ? safeProduct.images.map(getImageUrl).filter(Boolean)
+        : thumbnail
+          ? [thumbnail]
+          : [],
     dPrice: discountPrice,
     oldPrice: price,
     mPrice: price,
     discountPercentage:
-      product.discountPercentage ||
+      safeProduct.discountPercentage ||
       (price > 0 && discountPrice < price
         ? Math.round(((price - discountPrice) / price) * 100)
         : 0),
-    ratingStars: Math.round(product.rating || 0),
-    rating: product.reviewCount || product.rating || 0,
+    ratingStars: Math.round(safeProduct.rating || 0),
+    rating: safeProduct.reviewCount || safeProduct.rating || 0,
   };
 };
 
 export const getProducts = async params => {
-  const { data } = await api.get('/products', { params });
-  return data.data.map(normalizeProduct);
+  const response = await api.get('/products', { params });
+  return getCollection(getResponseData(response), 'products').map(
+    normalizeProduct,
+  );
 };
 
 export const getCategories = async () => {
-  const { data } = await api.get('/categories');
-  return data.data;
+  const response = await api.get('/categories');
+  return getCollection(getResponseData(response), 'categories');
 };
 
 export const getCategoryBySlug = async slug => {
-  const { data } = await api.get(
+  const response = await api.get(
     `/categories/slug/${encodeURIComponent(slug)}`,
   );
-  return data.data;
+  const payload = getResponseData(response);
+  return payload?.category ?? payload ?? {};
 };
 
 export const getProductById = async id => {
-  const { data } = await api.get(`/products/${encodeURIComponent(id)}`);
-  return normalizeProduct(data.data);
+  const response = await api.get(`/products/${encodeURIComponent(id)}`);
+  const payload = getResponseData(response);
+  return normalizeProduct(payload?.product ?? payload);
 };
 
 export const getHomeData = async () => {
-  const { data } = await api.get('/home');
+  const response = await api.get('/home');
+  const payload = getResponseData(response);
+  const homeData = payload?.home ?? payload ?? {};
+
   return {
-    ...data.data,
-    featured: data.data.featured.map(normalizeProduct),
-    bestSellers: data.data.bestSellers.map(normalizeProduct),
-    newArrivals: data.data.newArrivals.map(normalizeProduct),
-    discountProducts: data.data.discountProducts.map(normalizeProduct),
+    ...homeData,
+    featured: getCollection(homeData, 'featured').map(normalizeProduct),
+    bestSellers: getCollection(homeData, 'bestSellers').map(normalizeProduct),
+    newArrivals: getCollection(homeData, 'newArrivals').map(normalizeProduct),
+    discountProducts: getCollection(homeData, 'discountProducts').map(
+      normalizeProduct,
+    ),
   };
 };
 

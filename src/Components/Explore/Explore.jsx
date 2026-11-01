@@ -25,13 +25,14 @@ const Explore = () => {
     let active = true;
     getProducts({ limit: 12 })
       .then(products => {
-        if (active) setExploreItems(products);
+        if (active) setExploreItems(Array.isArray(products) ? products : []);
       })
       .catch(error => console.error('Failed to load products:', error));
     return () => {
       active = false;
     };
   }, []);
+  const safeExploreItems = Array.isArray(exploreItems) ? exploreItems : [];
 
   const renderStars = count =>
     Array.from({ length: 5 }, (_, i) => (
@@ -108,7 +109,7 @@ const Explore = () => {
           }}
           slidesPerGroup={1}
         >
-          {exploreItems.slice(0, visibleCount).map(item => {
+          {safeExploreItems.slice(0, visibleCount).map(item => {
             const isWished = wishlist.some(w => w.id === item.id);
 
             const isOutOfStock = item.stock <= 0;

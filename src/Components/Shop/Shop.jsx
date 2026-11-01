@@ -25,6 +25,8 @@ const Shop = () => {
   const searchQuery = searchParams.get('search') || '';
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const safeCategories = Array.isArray(categories) ? categories : [];
+  const safeProducts = Array.isArray(products) ? products : [];
 
   const Toast = Swal.mixin({
     toast: true,
@@ -56,10 +58,10 @@ const Shop = () => {
         const params = { limit: 100, search: searchQuery || undefined };
         if (categoryParam) {
           const category = await getCategoryBySlug(categoryParam);
-          params.category = category._id;
+          params.category = category?._id;
         }
         const items = await getProducts(params);
-        if (active) setProducts(items);
+        if (active) setProducts(Array.isArray(items) ? items : []);
       } catch (error) {
         console.error('Failed to load products:', error);
         if (active) setProducts([]);
@@ -74,11 +76,11 @@ const Shop = () => {
   }, [categoryParam, searchQuery]);
 
   const indexOfLast = currentPage * productsPerPage;
-  const currentProducts = products.slice(
+  const currentProducts = safeProducts.slice(
     indexOfLast - productsPerPage,
     indexOfLast,
   );
-  const totalPages = Math.ceil(products.length / productsPerPage);
+  const totalPages = Math.ceil(safeProducts.length / productsPerPage);
 
   return (
     <section className="pt-10 md:pt-20 pb-10 md:pb-24 font-poppins">
@@ -107,7 +109,7 @@ const Shop = () => {
                     All Categories
                   </Link>
 
-                  {categories.map(c => (
+                  {safeCategories.map(c => (
                     <Link
                       key={c.slug}
                       to={`/shop?category=${c.slug}`}
@@ -137,7 +139,7 @@ const Shop = () => {
                 All Categories
               </Link>
 
-              {categories.map(c => (
+              {safeCategories.map(c => (
                 <Link
                   key={c.slug}
                   to={`/shop?category=${c.slug}`}

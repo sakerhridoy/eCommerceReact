@@ -68,7 +68,11 @@ const ProductDetails = () => {
         const products = categoryId
           ? await getProducts({ category: categoryId, limit: 8 })
           : [];
-        setRelatedProducts(products.filter(p => p.id !== loadedProduct.id));
+        setRelatedProducts(
+          Array.isArray(products)
+            ? products.filter(p => p.id !== loadedProduct.id)
+            : [],
+        );
       } catch (err) {
         console.error('Error fetching product:', err);
         setError('Failed to load product details');
@@ -155,7 +159,7 @@ const ProductDetails = () => {
   const mainImageSrc = getImageUrl(rawMainImage);
 
   const thumbnails =
-    product.images?.slice(0, 4) ||
+    (Array.isArray(product.images) ? product.images.slice(0, 4) : null) ||
     [
       product.thumbnail,
       product.thumbnail,
@@ -390,7 +394,7 @@ const ProductDetails = () => {
         </div>
 
         {/* ================= RELATED PRODUCTS ================= */}
-        {relatedProducts.length > 0 && (
+        {Array.isArray(relatedProducts) && relatedProducts.length > 0 && (
           <div className="mt-24 mb-10">
             <div className="flex items-center gap-4 mb-8">
               <div className="w-5 h-10 bg-[#DB4444] rounded-sm"></div>
@@ -400,7 +404,10 @@ const ProductDetails = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-              {relatedProducts.slice(0, 4).map(item => {
+              {(Array.isArray(relatedProducts)
+                ? relatedProducts
+                : []
+              ).slice(0, 4).map(item => {
                 const isRelatedInCart = cart.some(c => c.id === item.id);
                 const isRelatedInWishlist = wishlist.some(
                   w => w.id === item.id,
