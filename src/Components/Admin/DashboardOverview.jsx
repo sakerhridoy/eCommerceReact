@@ -197,15 +197,24 @@ const DashboardOverview = () => {
             className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-5 hover:shadow-md hover:border-red-200 transition-all duration-300 cursor-pointer group"
           >
             <div
-              className={`w-14 h-14 rounded-full flex items-center justify-center ${stat.bg} group-hover:scale-110 transition-transform`}
+              className={`min-w-[56px] w-14 h-14 rounded-full flex items-center justify-center ${stat.bg} group-hover:scale-110 transition-transform`}
             >
               {stat.icon}
             </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500 mb-1 group-hover:text-[#DB4444] transition-colors">
+
+            {/* এখানে flex-1 এবং min-w-0 যোগ করা হয়েছে */}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-500 mb-1 group-hover:text-[#DB4444] transition-colors truncate">
                 {stat.title}
               </p>
-              <h3 className="text-2xl font-bold text-gray-900">{stat.value}</h3>
+
+              {/* এখানে truncate যোগ করা হয়েছে টেক্সট বাইরে যাওয়া ঠেকাতে */}
+              <h3
+                className="text-2xl font-bold text-gray-900 truncate"
+                title={stat.value} // title দিলে মাউস হোভার করলে ফুল অ্যামাউন্ট দেখাবে
+              >
+                {stat.value}
+              </h3>
             </div>
           </div>
         ))}
