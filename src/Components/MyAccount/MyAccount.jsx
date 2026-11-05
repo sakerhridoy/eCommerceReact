@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { VscEye, VscEyeClosed } from 'react-icons/vsc';
 import {
@@ -10,16 +10,44 @@ import {
   FiXCircle,
   FiHeart,
   FiGrid,
+  FiEdit2,
+  FiTrash2,
+  FiPlus,
+  FiCamera,
 } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
-import { getMyOrders } from '../../api/catalog';
+import {
+  getMyOrders,
+  getImageUrl,
+  updateMyProfile,
+  uploadMyAvatar,
+  getMyAddresses,
+  addMyAddress,
+  updateMyAddress,
+  deleteMyAddress,
+  setDefaultMyAddress,
+} from '../../api/catalog';
 import api from '../../api/client';
 import useShopStore from '../../store/cartStore';
+import { isAdminRole } from '../../utils/permissions';
+
+const EMPTY_ADDRESS = {
+  fullName: '',
+  phone: '',
+  street: '',
+  city: '',
+  state: '',
+  zipCode: '',
+  country: '',
+  type: 'shipping',
+  isDefault: false,
+};
 
 const MyAccount = () => {
   const { user, setUser } = useAuth();
   const useNavigateInstance = useNavigate();
   const wishlistItems = useShopStore(state => state.wishlist);
+  const avatarInputRef = useRef(null);
 
   const [activeTab, setActiveTab] = useState('profile');
 
@@ -29,6 +57,7 @@ const MyAccount = () => {
     firstName: firstName || '',
     lastName: lastNameParts.join(' '),
     email: user?.email || '',
+    phone: user?.phone || '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
@@ -40,9 +69,31 @@ const MyAccount = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   const [orders, setOrders] = useState([]);
   const [fetchingData, setFetchingData] = useState(false);
+
+  const [addresses, setAddresses] = useState([]);
+  const [addressLoading, setAddressLoading] = useState(false);
+  const [addressError, setAddressError] = useState('');
+  const [addressModalOpen, setAddressModalOpen] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState(null);
+  const [addressForm, setAddressForm] = useState(EMPTY_ADDRESS);
+  const [addressErrors, setAddressErrors] = useState({});
+  const [addressSaving, setAddressSaving] = useState(false);
+
+  // Keep profile form in sync when the authenticated user changes
+  useEffect(() => {
+    const [first, ...rest] = (user?.name || '').split(' ');
+    setForm(prev => ({
+      ...prev,
+      firstName: first || '',
+      lastName: rest.join(' '),
+      email: user?.email || '',
+      phone: user?.phone || '',
+    }));
+  }, [user]);
 
   useEffect(() => {
     if (!['returns', 'cancellations'].includes(activeTab)) {
@@ -64,6 +115,27 @@ const MyAccount = () => {
     fetchData();
   }, [activeTab]);
 
+  // Load saved addresses when the Address Book tab is opened
+  useEffect(() => {
+    if (activeTab !== 'address') return;
+
+    const fetchAddresses = async () => {
+      setAddressLoading(true);
+      setAddressError('');
+      try {
+        const data = await getMyAddresses();
+        setAddresses(Array.isArray(data) ? data : []);
+      } catch (err) {
+        setAddressError(
+          err.response?.data?.message || 'Failed to load addresses',
+        );
+      } finally {
+        setAddressLoading(false);
+      }
+    };
+    fetchAddresses();
+  }, [activeTab]);
+
   const handleChange = e => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
@@ -79,9 +151,16 @@ const MyAccount = () => {
     try {
       const fullName =
         `${form.firstName.trim()} ${form.lastName.trim()}`.trim();
-      if (fullName && fullName !== user?.name) {
-        const { data } = await api.put('/auth/profile', { name: fullName });
-        setUser(data.data);
+      const trimmedPhone = form.phone.trim();
+      const profilePayload = {};
+      if (fullName && fullName !== user?.name) profilePayload.name = fullName;
+      if (trimmedPhone !== (user?.phone || '')) {
+        profilePayload.phone = trimmedPhone;
+      }
+
+      if (Object.keys(profilePayload).length > 0) {
+        const updatedUser = await updateMyProfile(profilePayload);
+        setUser(updatedUser);
       }
 
       if (form.newPassword) {
@@ -116,17 +195,148 @@ const MyAccount = () => {
     }
   };
 
+  const handleAvatarChange = async e => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setError('');
+    setSuccess('');
+    setAvatarUploading(true);
+    try {
+      const updatedUser = await uploadMyAvatar(file);
+      setUser(updatedUser);
+      setSuccess('Avatar updated successfully ✓');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to upload avatar');
+    } finally {
+      setAvatarUploading(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = '';
+    }
+  };
+
   const handleCancel = () => {
     setForm({
       firstName: firstName || '',
       lastName: lastNameParts.join(' '),
       email: user?.email || '',
+      phone: user?.phone || '',
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
     });
     setError('');
     setSuccess('');
+  };
+
+  // ================= Address Book handlers =================
+  const openAddAddress = () => {
+    setEditingAddressId(null);
+    setAddressForm({
+      ...EMPTY_ADDRESS,
+      fullName: user?.name || '',
+      phone: user?.phone || '',
+      isDefault: addresses.length === 0,
+    });
+    setAddressErrors({});
+    setAddressModalOpen(true);
+  };
+
+  const openEditAddress = address => {
+    setEditingAddressId(address._id);
+    setAddressForm({
+      fullName: address.fullName || '',
+      phone: address.phone || '',
+      street: address.street || '',
+      city: address.city || '',
+      state: address.state || '',
+      zipCode: address.zipCode || '',
+      country: address.country || '',
+      type: address.type || 'shipping',
+      isDefault: !!address.isDefault,
+    });
+    setAddressErrors({});
+    setAddressModalOpen(true);
+  };
+
+  const handleAddressFieldChange = e => {
+    const { name, value, type, checked } = e.target;
+    setAddressForm(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+    setAddressErrors(prev => ({ ...prev, [name]: '' }));
+  };
+
+  const validateAddressForm = () => {
+    const nextErrors = {};
+    ['street', 'city', 'state', 'zipCode', 'country'].forEach(field => {
+      if (!addressForm[field].trim()) {
+        nextErrors[field] = `${
+          field.charAt(0).toUpperCase() + field.slice(1)
+        } is required`;
+      }
+    });
+    setAddressErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const handleAddressSubmit = async e => {
+    e.preventDefault();
+    if (!validateAddressForm()) return;
+
+    setAddressSaving(true);
+    setAddressError('');
+    try {
+      const payload = {
+        fullName: addressForm.fullName.trim(),
+        phone: addressForm.phone.trim(),
+        street: addressForm.street.trim(),
+        city: addressForm.city.trim(),
+        state: addressForm.state.trim(),
+        zipCode: addressForm.zipCode.trim(),
+        country: addressForm.country.trim(),
+        type: addressForm.type,
+        isDefault: addressForm.isDefault,
+      };
+
+      const data = editingAddressId
+        ? await updateMyAddress(editingAddressId, payload)
+        : await addMyAddress(payload);
+
+      setAddresses(Array.isArray(data) ? data : []);
+      setAddressModalOpen(false);
+    } catch (err) {
+      setAddressError(
+        err.response?.data?.message || 'Failed to save address',
+      );
+    } finally {
+      setAddressSaving(false);
+    }
+  };
+
+  const handleDeleteAddress = async id => {
+    if (!window.confirm('Delete this address?')) return;
+    setAddressError('');
+    try {
+      const data = await deleteMyAddress(id);
+      setAddresses(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setAddressError(
+        err.response?.data?.message || 'Failed to delete address',
+      );
+    }
+  };
+
+  const handleSetDefaultAddress = async id => {
+    setAddressError('');
+    try {
+      const data = await setDefaultMyAddress(id);
+      setAddresses(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setAddressError(
+        err.response?.data?.message || 'Failed to update default address',
+      );
+    }
   };
 
   const filteredOrders = orders.filter(order => {
@@ -136,8 +346,8 @@ const MyAccount = () => {
     return true;
   });
 
-  // Check if user is admin (role lowercase 'admin' as configured earlier)
-  const isAdmin = user?.role?.toLowerCase() === 'admin';
+  // Check if user has an admin/staff role.
+  const isAdmin = isAdminRole(user?.role);
 
   return (
     <section className="pb-35 font-poppins">
@@ -249,6 +459,49 @@ const MyAccount = () => {
                   Edit Your Profile
                 </h3>
 
+                {/* Avatar uploader */}
+                <div className="flex items-center gap-5 mb-8">
+                  <div className="relative">
+                    <div className="w-20 h-20 rounded-full overflow-hidden bg-[#F5F5F5] border border-gray-200 flex items-center justify-center">
+                      {user?.avatar?.url ? (
+                        <img
+                          src={getImageUrl(user.avatar)}
+                          alt={user?.name || 'Avatar'}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <FiUser size={28} className="text-gray-400" />
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => avatarInputRef.current?.click()}
+                      disabled={avatarUploading}
+                      className="absolute -bottom-1 -right-1 bg-[#DB4444] text-white p-2 rounded-full shadow hover:bg-red-600 transition-colors disabled:opacity-60"
+                      title="Change avatar"
+                    >
+                      <FiCamera size={14} />
+                    </button>
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarChange}
+                      className="hidden"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-black">
+                      Profile Photo
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {avatarUploading
+                        ? 'Uploading...'
+                        : 'JPG or PNG, up to 5MB'}
+                    </p>
+                  </div>
+                </div>
+
                 {error && (
                   <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
                     {error}
@@ -288,15 +541,29 @@ const MyAccount = () => {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="font-normal text-base leading-6 mb-2 block text-black">
-                      Email
-                    </label>
-                    <input
-                      value={form.email}
-                      disabled
-                      className="w-full bg-[#F5F5F5] px-4 py-3 rounded-md text-gray-500 cursor-not-allowed"
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="font-normal text-base leading-6 mb-2 block text-black">
+                        Email
+                      </label>
+                      <input
+                        value={form.email}
+                        disabled
+                        className="w-full bg-[#F5F5F5] px-4 py-3 rounded-md text-gray-500 cursor-not-allowed"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-normal text-base leading-6 mb-2 block text-black">
+                        Phone
+                      </label>
+                      <input
+                        name="phone"
+                        value={form.phone}
+                        onChange={handleChange}
+                        placeholder="Enter phone number"
+                        className="w-full bg-[#F5F5F5] border border-transparent focus:border-[#DB4444] rounded-md px-4 py-3 outline-none transition-all"
+                      />
+                    </div>
                   </div>
 
                   <div className="space-y-6 pt-6 border-t border-gray-100">
@@ -407,27 +674,106 @@ const MyAccount = () => {
                   <h3 className="text-[#DB4444] font-medium text-xl">
                     Address Book
                   </h3>
-                  <button className="bg-[#DB4444] text-white px-4 py-2 rounded-sm text-sm hover:bg-red-600 transition-colors">
-                    + Add New Address
+                  <button
+                    onClick={openAddAddress}
+                    className="bg-[#DB4444] text-white px-4 py-2 rounded-sm text-sm hover:bg-red-600 transition-colors flex items-center gap-1.5"
+                  >
+                    <FiPlus size={14} /> Add New Address
                   </button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 border border-gray-200 rounded-sm bg-gray-50 relative">
-                    <span className="absolute top-3 right-3 text-xs bg-red-100 text-[#DB4444] px-2 py-0.5 rounded font-medium">
-                      Default
-                    </span>
-                    <p className="font-semibold text-black">
-                      {user?.name || 'Customer Name'}
-                    </p>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Sylhet, Shiber Bazar - 3100
-                    </p>
-                    <p className="text-sm text-gray-600">Bangladesh</p>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Phone: +8801700000000
+
+                {addressError && (
+                  <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
+                    {addressError}
+                  </div>
+                )}
+
+                {addressLoading ? (
+                  <div className="text-center py-10 text-gray-500">
+                    Loading addresses...
+                  </div>
+                ) : addresses.length === 0 ? (
+                  <div className="text-center py-12 bg-gray-50 rounded border border-dashed">
+                    <FiMapPin
+                      className="mx-auto text-gray-300 mb-2"
+                      size={40}
+                    />
+                    <p className="text-gray-500 text-sm">
+                      No saved addresses yet.
                     </p>
                   </div>
-                </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {addresses.map(address => (
+                      <div
+                        key={address._id}
+                        className="p-4 border border-gray-200 rounded-sm bg-gray-50 relative"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded font-medium capitalize">
+                              {address.type || 'shipping'}
+                            </span>
+                            {address.isDefault && (
+                              <span className="text-xs bg-red-100 text-[#DB4444] px-2 py-0.5 rounded font-medium">
+                                Default
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => openEditAddress(address)}
+                              className="text-gray-500 hover:text-[#DB4444] transition-colors"
+                              title="Edit"
+                            >
+                              <FiEdit2 size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteAddress(address._id)}
+                              className="text-gray-500 hover:text-red-600 transition-colors"
+                              title="Delete"
+                            >
+                              <FiTrash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
+                        {address.fullName && (
+                          <p className="font-semibold text-black mt-3">
+                            {address.fullName}
+                          </p>
+                        )}
+                        <p className="text-sm text-gray-600 mt-1">
+                          {[
+                            address.street,
+                            address.city,
+                            address.state,
+                            address.zipCode,
+                          ]
+                            .filter(Boolean)
+                            .join(', ')}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {address.country}
+                        </p>
+                        {address.phone && (
+                          <p className="text-sm text-gray-600 mt-2">
+                            Phone: {address.phone}
+                          </p>
+                        )}
+                        {!address.isDefault && (
+                          <button
+                            onClick={() =>
+                              handleSetDefaultAddress(address._id)
+                            }
+                            className="mt-3 text-xs text-[#DB4444] font-medium hover:underline"
+                          >
+                            Set as Default
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -576,6 +922,205 @@ const MyAccount = () => {
           </main>
         </div>
       </div>
+
+      {/* ================= ADDRESS MODAL ================= */}
+      {addressModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8 overflow-y-auto">
+          <div className="bg-white w-full max-w-lg rounded-md shadow-lg p-6 my-auto">
+            <h3 className="text-lg font-semibold text-black mb-5">
+              {editingAddressId ? 'Edit Address' : 'Add New Address'}
+            </h3>
+
+            <form onSubmit={handleAddressSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Full Name
+                  </label>
+                  <input
+                    name="fullName"
+                    value={addressForm.fullName}
+                    onChange={handleAddressFieldChange}
+                    placeholder="Full name"
+                    className="w-full bg-[#F5F5F5] border border-transparent focus:border-[#DB4444] rounded-md px-3 py-2.5 outline-none transition-all text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone
+                  </label>
+                  <input
+                    name="phone"
+                    value={addressForm.phone}
+                    onChange={handleAddressFieldChange}
+                    placeholder="Phone number"
+                    className="w-full bg-[#F5F5F5] border border-transparent focus:border-[#DB4444] rounded-md px-3 py-2.5 outline-none transition-all text-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Street Address
+                </label>
+                <input
+                  name="street"
+                  value={addressForm.street}
+                  onChange={handleAddressFieldChange}
+                  placeholder="House, road, area"
+                  className={`w-full bg-[#F5F5F5] border rounded-md px-3 py-2.5 outline-none transition-all text-sm ${
+                    addressErrors.street
+                      ? 'border-red-400'
+                      : 'border-transparent focus:border-[#DB4444]'
+                  }`}
+                />
+                {addressErrors.street && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {addressErrors.street}
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    City
+                  </label>
+                  <input
+                    name="city"
+                    value={addressForm.city}
+                    onChange={handleAddressFieldChange}
+                    placeholder="City"
+                    className={`w-full bg-[#F5F5F5] border rounded-md px-3 py-2.5 outline-none transition-all text-sm ${
+                      addressErrors.city
+                        ? 'border-red-400'
+                        : 'border-transparent focus:border-[#DB4444]'
+                    }`}
+                  />
+                  {addressErrors.city && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {addressErrors.city}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    State
+                  </label>
+                  <input
+                    name="state"
+                    value={addressForm.state}
+                    onChange={handleAddressFieldChange}
+                    placeholder="State"
+                    className={`w-full bg-[#F5F5F5] border rounded-md px-3 py-2.5 outline-none transition-all text-sm ${
+                      addressErrors.state
+                        ? 'border-red-400'
+                        : 'border-transparent focus:border-[#DB4444]'
+                    }`}
+                  />
+                  {addressErrors.state && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {addressErrors.state}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Zip Code
+                  </label>
+                  <input
+                    name="zipCode"
+                    value={addressForm.zipCode}
+                    onChange={handleAddressFieldChange}
+                    placeholder="Zip code"
+                    className={`w-full bg-[#F5F5F5] border rounded-md px-3 py-2.5 outline-none transition-all text-sm ${
+                      addressErrors.zipCode
+                        ? 'border-red-400'
+                        : 'border-transparent focus:border-[#DB4444]'
+                    }`}
+                  />
+                  {addressErrors.zipCode && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {addressErrors.zipCode}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Country
+                  </label>
+                  <input
+                    name="country"
+                    value={addressForm.country}
+                    onChange={handleAddressFieldChange}
+                    placeholder="Country"
+                    className={`w-full bg-[#F5F5F5] border rounded-md px-3 py-2.5 outline-none transition-all text-sm ${
+                      addressErrors.country
+                        ? 'border-red-400'
+                        : 'border-transparent focus:border-[#DB4444]'
+                    }`}
+                  />
+                  {addressErrors.country && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {addressErrors.country}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Address Type
+                  </label>
+                  <select
+                    name="type"
+                    value={addressForm.type}
+                    onChange={handleAddressFieldChange}
+                    className="w-full bg-[#F5F5F5] border border-transparent focus:border-[#DB4444] rounded-md px-3 py-2.5 outline-none transition-all text-sm capitalize"
+                  >
+                    <option value="shipping">Shipping</option>
+                    <option value="billing">Billing</option>
+                    <option value="both">Shipping &amp; Billing</option>
+                  </select>
+                </div>
+              </div>
+
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="isDefault"
+                  checked={addressForm.isDefault}
+                  onChange={handleAddressFieldChange}
+                  className="accent-[#DB4444] w-4 h-4"
+                />
+                Set as default address
+              </label>
+
+              <div className="flex justify-end gap-4 pt-4 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setAddressModalOpen(false)}
+                  className="px-5 py-2.5 text-sm text-gray-600 hover:text-black"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={addressSaving}
+                  className={`bg-[#DB4444] text-white px-6 py-2.5 rounded-sm text-sm transition-colors ${
+                    addressSaving
+                      ? 'opacity-70 cursor-not-allowed'
+                      : 'hover:bg-red-600'
+                  }`}
+                >
+                  {addressSaving ? 'Saving...' : 'Save Address'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

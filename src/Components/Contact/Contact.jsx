@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiPhone, FiMail } from 'react-icons/fi';
 import api from '../../api/client';
+import { getSiteSettings } from '../../api/catalog';
+import SEO from '../SEO';
 
 const Contact = () => {
   const [form, setForm] = useState({
@@ -14,6 +16,27 @@ const Contact = () => {
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState({ type: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [settings, setSettings] = useState({});
+
+  useEffect(() => {
+    let active = true;
+
+    const fetchSettings = async () => {
+      const data = await getSiteSettings();
+      if (active) setSettings(data || {});
+    };
+
+    fetchSettings();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const supportHours =
+    settings.supportHours || 'We are available 24/7, 7 days a week.';
+  const supportPhone = settings.phone || '+88015-88888-9999';
+  const supportEmail = settings.email || 'exclusive@gmail.com';
 
   const validateField = (name, value) => {
     let error = '';
@@ -104,6 +127,10 @@ const Contact = () => {
 
   return (
     <section className="pb-25 md:pb-35">
+      <SEO
+        title="Contact Us"
+        description="Get in touch with the Exclusive support team — we're here to help with orders, returns, and any questions."
+      />
       <div className="container mx-auto px-4">
         <div className="py-10 md:py-20">
           <p className="text-sm text-black/50 font-poppins font-normal leading-5.25">
@@ -124,10 +151,10 @@ const Contact = () => {
                 </h4>
               </div>
               <p className="text-sm font-poppins font-normal leading-5.25 text-black mb-4">
-                We are available 24/7, 7 days a week.
+                {supportHours}
               </p>
               <p className="text-sm font-poppins font-normal leading-5.25 text-black pb-8">
-                Phone: +880161112222
+                Phone: {supportPhone}
               </p>
             </div>
 
@@ -146,10 +173,7 @@ const Contact = () => {
                 Fill out our form and we will contact you within 24 hours.
               </p>
               <p className="text-sm font-poppins font-normal leading-5.25 text-black mb-4">
-                Emails: sakerahmedhridoy@gmail.com
-              </p>
-              <p className="text-sm font-poppins font-normal leading-5.25 text-black">
-                Emails: support@exclusive.com
+                Emails: {supportEmail}
               </p>
             </div>
           </div>

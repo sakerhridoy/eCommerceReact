@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import api from '../../api/client';
 import { useGoogleLogin } from '@react-oauth/google';
 import { FcGoogle } from 'react-icons/fc';
+import SEO from '../SEO';
 
 const Login = () => {
   const { login, user } = useAuth();
@@ -130,18 +131,19 @@ const Login = () => {
   };
 
   return (
-    <section className="relative pt-10 md:pt-19 pb-25 md:pb-35 px-4 lg:px-0">
-      <div className="hidden lg:flex w-1/2">
+    <section className="relative flex min-h-screen items-center px-4 lg:px-0">
+      <SEO title="Log In" noIndex />
+      <div className="absolute inset-y-0 left-0 hidden w-1/2 lg:block">
         <img
           src={signupImg}
-          className="w-full h-full object-cover"
+          className="h-full w-full object-cover"
           alt="Login illustration"
         />
       </div>
 
       {/* FORM */}
-      <div className="lg:absolute lg:inset-0">
-        <div className="container h-full flex md:justify-end items-center">
+      <div className="relative z-10 w-full">
+        <div className="container flex justify-center lg:justify-end">
           <div className="w-full max-w-md">
             <h2 className="text-4xl font-medium font-inter pb-6">
               Log in to Exclusive

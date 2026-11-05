@@ -11,8 +11,9 @@ import logo from '../../assets/images/logo.png';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useShopStore from '../../store/cartStore';
 import { useAuth } from '../../contexts/AuthContext';
-import { getProducts } from '../../api/catalog';
+import { getProducts, getImageUrl } from '../../api/catalog';
 import { useTranslation } from 'react-i18next';
+import { isAdminRole } from '../../utils/permissions';
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
@@ -22,6 +23,7 @@ const Navbar = () => {
   const cartCount = useShopStore(state => state.cartCount);
   const wishlistCount = useShopStore(state => state.wishlistCount);
   const { user, logout } = useAuth();
+  const isAdmin = isAdminRole(user?.role);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAcc, setShowAcc] = useState(false);
@@ -283,84 +285,119 @@ const Navbar = () => {
                 <div className="relative" ref={dropdownRef}>
                   <div
                     onClick={() => setShowAcc(!showAcc)}
-                    className="w-8 h-8 rounded-full bg-[#DB4444] text-white flex items-center justify-center cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-[#DB4444] text-white flex items-center justify-center cursor-pointer overflow-hidden ring-2 ring-transparent hover:ring-[#DB4444]/30 transition"
                   >
-                    <LuUser />
+                    {user?.avatar?.url ? (
+                      <img
+                        src={getImageUrl(user.avatar)}
+                        alt={user?.name || 'User'}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <LuUser />
+                    )}
                   </div>
                   <div
-                    className={`absolute right-0 top-12 w-56.25 bg-[#7D6C8C]/60 backdrop-blur-md rounded-sm shadow-lg px-5 py-4 z-50 transition-all duration-300 ${showAcc ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'}`}
+                    className={`absolute right-0 top-12 w-64 origin-top-right bg-gradient-to-br from-[#8A7A99]/60 to-[#5F5070]/80 backdrop-blur-md rounded-2xl shadow-2xl ring-1 ring-white/10 z-50 overflow-hidden transition-all duration-200 ${showAcc ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 -translate-y-1 pointer-events-none'}`}
                   >
-                    <ul className="font-poppins font-normal text-[14px] leading-5.25 text-[#FAFAFA] space-y-4.5">
+                    <ul className="font-poppins text-[14px] text-[#FAFAFA]">
                       {user ? (
                         <>
-                          <li>
+                          {/* Header: avatar + name + email (সব ইউজারের জন্য) */}
+                          <li className="flex items-center gap-3 px-5 py-4 border-b border-white/15 bg-gradient-to-r from-white/15 to-transparent">
+                            <div className="w-10 h-10 rounded-full bg-[#DB4444] text-white overflow-hidden flex items-center justify-center flex-shrink-0">
+                              {user?.avatar?.url ? (
+                                <img
+                                  src={getImageUrl(user.avatar)}
+                                  alt={user?.name || 'User'}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <LuUser />
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-semibold text-white truncate">
+                                {user?.name || 'User'}
+                              </p>
+                              <p className="text-xs text-white/70 truncate">
+                                {user?.email}
+                              </p>
+                            </div>
+                          </li>
+                          <li className="p-1.5">
                             <Link
-                              to="/myAccount"
+                              to={isAdmin ? '/admin/profile' : '/myAccount'}
                               onClick={() => setShowAcc(false)}
-                              className="flex items-center gap-3"
+                              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-colors hover:bg-white/10 hover:text-white"
                             >
-                              <LuUser /> {t('Manage My Account')}
+                              <LuUser className="text-lg" />
+                              {isAdmin
+                                ? t('Admin Profile')
+                                : t('Manage My Account')}
                             </Link>
                           </li>
-                          {user?.role === 'admin' && (
-                            <li>
+                          {isAdmin && (
+                            <li className="px-1.5">
                               <Link
                                 to="/admin"
                                 onClick={() => setShowAcc(false)}
-                                className="flex items-center gap-3"
+                                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-colors hover:bg-white/10 hover:text-white"
                               >
-                                <LuUser /> {t('Admin Dashboard')}
+                                <LuUser className="text-lg" />{' '}
+                                {t('Admin Dashboard')}
                               </Link>
                             </li>
                           )}
-                          <li>
+                          <li className="px-1.5">
                             <Link
-                              to={
-                                user?.role === 'admin'
-                                  ? '/admin/orders'
-                                  : '/my-orders'
-                              }
+                              to={isAdmin ? '/admin/orders' : '/my-orders'}
                               onClick={() => setShowAcc(false)}
-                              className="flex items-center gap-3"
+                              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-colors hover:bg-white/10 hover:text-white"
                             >
-                              <LuShoppingBag /> {t('My Orders')}
+                              <LuShoppingBag className="text-lg" />{' '}
+                              {t('My Orders')}
                             </Link>
                           </li>
                           {/* === Dynamic Reviews Link (Desktop) === */}
-                          <li>
+                          <li className="px-1.5">
                             <Link
-                              to={
-                                user?.role === 'admin'
-                                  ? '/admin/reviews'
-                                  : '/my-reviews'
-                              }
+                              to={isAdmin ? '/admin/reviews' : '/my-reviews'}
                               onClick={() => setShowAcc(false)}
-                              className="flex items-center gap-3"
+                              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-colors hover:bg-white/10 hover:text-white"
                             >
-                              <LuStar />{' '}
-                              {user?.role === 'admin'
-                                ? t('All Reviews')
-                                : t('My Reviews')}
+                              <LuStar className="text-lg" />{' '}
+                              {isAdmin ? t('All Reviews') : t('My Reviews')}
                             </Link>
                           </li>
-                          <li
-                            onClick={handleLogout}
-                            className="flex items-center gap-3 cursor-pointer"
-                          >
-                            <TbLogout2 /> {t('logout')}
+                          <li className="px-1.5 pb-1.5">
+                            <div className="border-t border-white/15 pt-1.5">
+                              <button
+                                type="button"
+                                onClick={handleLogout}
+                                className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-red-200 transition-colors hover:bg-white/10 hover:text-white"
+                              >
+                                <TbLogout2 className="text-lg" /> {t('logout')}
+                              </button>
+                            </div>
                           </li>
                         </>
                       ) : (
                         <>
-                          <li>
-                            <Link to="/login" onClick={() => setShowAcc(false)}>
+                          <li className="p-1.5">
+                            <Link
+                              to="/login"
+                              onClick={() => setShowAcc(false)}
+                              className="flex items-center justify-center px-3.5 py-2.5 rounded-xl bg-[#DB4444] text-white font-medium transition-colors hover:bg-[#b80808]"
+                            >
                               {t('login')}
                             </Link>
                           </li>
-                          <li>
+                          <li className="p-1.5 pt-0">
                             <Link
                               to="/signup"
                               onClick={() => setShowAcc(false)}
+                              className="flex items-center justify-center px-3.5 py-2.5 rounded-xl border border-white/40 font-medium transition-colors hover:bg-white/10 hover:border-white"
                             >
                               {t('signUp')}
                             </Link>
@@ -439,12 +476,36 @@ const Navbar = () => {
 
               {user && (
                 <>
+                  <li className="flex items-center gap-3 pb-4 border-b border-gray-100">
+                    <div className="w-10 h-10 rounded-full bg-[#DB4444] text-white overflow-hidden flex items-center justify-center flex-shrink-0">
+                      {user?.avatar?.url ? (
+                        <img
+                          src={getImageUrl(user.avatar)}
+                          alt={user?.name || 'User'}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <LuUser />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-medium text-black truncate">
+                        {user?.name || 'User'}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </li>
                   <li>
-                    <Link to="/myAccount" onClick={closeMenu}>
-                      {t('manageMyAccount')}
+                    <Link
+                      to={isAdmin ? '/admin/profile' : '/myAccount'}
+                      onClick={closeMenu}
+                    >
+                      {isAdmin ? t('Admin Profile') : t('manageMyAccount')}
                     </Link>
                   </li>
-                  {user?.role === 'admin' && (
+                  {isAdmin && (
                     <li>
                       <Link to="/admin" onClick={closeMenu}>
                         {t('adminDashboard')}
@@ -453,9 +514,7 @@ const Navbar = () => {
                   )}
                   <li>
                     <Link
-                      to={
-                        user?.role === 'admin' ? '/admin/orders' : '/my-orders'
-                      }
+                      to={isAdmin ? '/admin/orders' : '/my-orders'}
                       onClick={closeMenu}
                     >
                       {t('myOrders')}
@@ -464,16 +523,10 @@ const Navbar = () => {
                   {/* === Dynamic Reviews Link (Mobile) === */}
                   <li>
                     <Link
-                      to={
-                        user?.role === 'admin'
-                          ? '/admin/reviews'
-                          : '/my-reviews'
-                      }
+                      to={isAdmin ? '/admin/reviews' : '/my-reviews'}
                       onClick={closeMenu}
                     >
-                      {user?.role === 'admin'
-                        ? t('allReviews')
-                        : t('myReviews')}
+                      {isAdmin ? t('allReviews') : t('myReviews')}
                     </Link>
                   </li>
                   <li onClick={handleLogout} className="cursor-pointer">

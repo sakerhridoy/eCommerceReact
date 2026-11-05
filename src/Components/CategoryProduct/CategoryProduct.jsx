@@ -4,6 +4,7 @@ import { IoEyeOutline } from 'react-icons/io5';
 import { Link, useParams } from 'react-router-dom';
 import { getCategoryBySlug, getProducts } from '../../api/catalog';
 import { useShop } from '../../contexts/ShopContext';
+import SEO from '../SEO';
 
 const CategoryProduct = () => {
   const { addToCart, addToWishlist } = useShop();
@@ -33,9 +34,16 @@ const CategoryProduct = () => {
 
   const [visibleCount, setVisibleCount] = useState(4);
   const safeCateProducts = Array.isArray(cateProducts) ? cateProducts : [];
+  const categoryName = (slug || 'products')
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, char => char.toUpperCase());
 
   return (
     <section className="pt-8">
+      <SEO
+        title={`${categoryName} Products`}
+        description={`Explore our ${categoryName} collection at Exclusive — top quality products at the best prices with fast delivery.`}
+      />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="pb-15">
           <h4 className='font-inter font-semibold text-[16px] leading-5 text-[#DB4444] pl-8.5 relative after:w-5 after:h-10 after:absolute after:content-[""] after:-top-2.5 after:left-0 after:bg-red-500 after:rounded-sm'>

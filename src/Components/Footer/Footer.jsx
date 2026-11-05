@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import footerLogo from '../../assets/images/footerLogo.png';
 import qrCode from '../../assets/images/qrCode.png';
@@ -8,9 +8,32 @@ import { RiFacebookLine, RiTwitterLine, RiLinkedinLine } from 'react-icons/ri';
 import { IoLogoInstagram } from 'react-icons/io';
 import { GoPaperAirplane } from 'react-icons/go';
 import Swal from 'sweetalert2';
+import { getSiteSettings } from '../../api/catalog';
 
 const Footer = () => {
   const [email, setEmail] = useState('');
+  const [settings, setSettings] = useState({});
+
+  useEffect(() => {
+    let active = true;
+
+    const fetchSettings = async () => {
+      const data = await getSiteSettings();
+      if (active) setSettings(data || {});
+    };
+
+    fetchSettings();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const supportEmail = settings.email || 'exclusive@gmail.com';
+  const supportPhone = settings.phone || '+88015-88888-9999';
+  const supportAddress =
+    settings.address || '111 Bijoy sarani, Dhaka, DH 1515, Bangladesh.';
+  const phoneHref = `tel:${supportPhone.replace(/[^+\d]/g, '')}`;
 
   const handleSubscribe = e => {
     e.preventDefault();
@@ -73,19 +96,19 @@ const Footer = () => {
                 </h5>
                 <div className="flex flex-col gap-4">
                   <p className="font-poppins font-normal text-base text-[#fafafa] leading-6 hover:text-gray-300 transition-colors cursor-default">
-                    111 Bijoy sarani, Dhaka, DH 1515, Bangladesh.
+                    {supportAddress}
                   </p>
                   <a
-                    href="mailto:exclusive@gmail.com"
+                    href={`mailto:${supportEmail}`}
                     className="font-poppins font-normal text-base text-[#fafafa] leading-6 hover:text-[#DB4444] transition-colors"
                   >
-                    exclusive@gmail.com
+                    {supportEmail}
                   </a>
                   <a
-                    href="tel:+88015888889999"
+                    href={phoneHref}
                     className="font-poppins font-normal text-base text-[#fafafa] leading-6 hover:text-[#DB4444] transition-colors"
                   >
-                    +88015-88888-9999
+                    {supportPhone}
                   </a>
                 </div>
               </div>
@@ -128,19 +151,19 @@ const Footer = () => {
                 </h5>
                 <div className="flex flex-col gap-4">
                   <Link
-                    to="/about"
+                    to="/privacy-policy"
                     className="font-poppins font-normal text-base text-[#fafafa] leading-6 hover:text-gray-300 transition-colors"
                   >
                     Privacy Policy
                   </Link>
                   <Link
-                    to="/about"
+                    to="/terms-of-use"
                     className="font-poppins font-normal text-base text-[#fafafa] leading-6 hover:text-gray-300 transition-colors"
                   >
                     Terms Of Use
                   </Link>
                   <Link
-                    to="/contact"
+                    to="/faq"
                     className="font-poppins font-normal text-base text-[#fafafa] leading-6 hover:text-gray-300 transition-colors"
                   >
                     FAQ

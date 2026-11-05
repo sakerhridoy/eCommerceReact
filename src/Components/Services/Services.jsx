@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { TbTruckDelivery } from 'react-icons/tb';
 import { TfiHeadphoneAlt } from 'react-icons/tfi';
 import { GoShieldCheck } from 'react-icons/go';
@@ -37,21 +38,24 @@ const Services = ({ className = '' }) => {
             </div>
 
             {/* CARD 2 */}
-            <div className="w-full sm:w-[45%] lg:w-[22%] text-center">
-              <div className="w-20 h-20 bg-[rgba(47,46,48,0.3)] rounded-full p-2.75 mx-auto">
-                <div className="w-14.5 h-14.5 bg-black rounded-full p-2.75 flex items-center justify-center">
+            <Link
+              to="/contact"
+              className="w-full sm:w-[45%] lg:w-[22%] text-center block group"
+            >
+              <div className="w-20 h-20 bg-[rgba(47,46,48,0.3)] rounded-full p-2.75 mx-auto group-hover:bg-[rgba(219,68,68,0.3)] transition-colors">
+                <div className="w-14.5 h-14.5 bg-black rounded-full p-2.75 flex items-center justify-center group-hover:bg-[#DB4444] transition-colors">
                   <TfiHeadphoneAlt className="text-white text-4xl transform scale-x-[-1]" />
                 </div>
               </div>
               <div className="pt-6">
-                <h4 className="font-poppins font-semibold text-xl text-black pb-2">
+                <h4 className="font-poppins font-semibold text-xl text-black pb-2 group-hover:text-[#DB4444] transition-colors">
                   24/7 CUSTOMER SERVICE
                 </h4>
                 <p className="font-poppins text-sm lg:text-xs xl:text-sm text-black">
                   Friendly 24/7 customer support
                 </p>
               </div>
-            </div>
+            </Link>
 
             {/* CARD 3 */}
             <div className="w-full sm:w-[45%] lg:w-[22%] text-center">

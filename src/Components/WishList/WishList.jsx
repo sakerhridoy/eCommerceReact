@@ -3,6 +3,7 @@ import { IoEyeOutline } from 'react-icons/io5';
 import { FaStar, FaHeart } from 'react-icons/fa';
 import { Link } from 'react-router';
 import useShopStore from '../../store/cartStore';
+import SEO from '../SEO';
 
 const WishList = () => {
   const wishlist = useShopStore(state => state.wishlist);
@@ -18,6 +19,7 @@ const WishList = () => {
   if (!wishlist.length) {
     return (
       <section className="pt-23.75 pb-35">
+        <SEO title="My Wishlist" noIndex />
         <div className="container text-center">
           <p className="text-black/50">Your wishlist is empty.</p>
         </div>
@@ -27,6 +29,7 @@ const WishList = () => {
 
   return (
     <section className="pt-23.75 pb-35 mx-4 xl:mx-0">
+      <SEO title="My Wishlist" noIndex />
       <div className="container">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {wishlist.map(item => (

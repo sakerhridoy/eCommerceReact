@@ -15,7 +15,9 @@ import aboutImg from '../../assets/images/about.png';
 import team1 from '../../assets/images/team1.png';
 import team2 from '../../assets/images/team2.png';
 import Services from '../Services/Services';
+import Testimonials from '../Testimonials/Testimonials';
 import api from '../../api/client';
+import SEO from '../SEO';
 
 const About = () => {
   const [aboutData, setAboutData] = useState({
@@ -48,6 +50,10 @@ const About = () => {
 
   return (
     <section className="pb-35 px-4 xl:px-0 font-poppins">
+      <SEO
+        title="About Us"
+        description="Exclusive is South Asia's premier online shopping marketplace — 10,500+ sellers, 300 brands, and millions of happy customers."
+      />
       <div className="container mx-auto">
         <p className="text-sm text-black/50 py-10 lg:py-20 font-normal leading-5.25">
           <Link to="/">Home</Link> / <span className="text-black">About</span>
@@ -196,6 +202,9 @@ const About = () => {
 
           <div className="team-pagination flex justify-center gap-3 mt-8"></div>
         </div>
+
+        <Testimonials className="mb-35" />
+
         <Services className="pb-0" />
       </div>
     </section>

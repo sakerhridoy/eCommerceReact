@@ -12,8 +12,12 @@ import {
 } from 'react-icons/fi';
 import api from '../../api/client';
 import { getAllCustomers } from '../../api/catalog';
+import { useAuth } from '../../contexts/AuthContext';
+import { can, PERMISSIONS, isAdminRole } from '../../utils/permissions';
 
 const Customers = () => {
+  const { user } = useAuth();
+  const canManage = can(user, PERMISSIONS.CUSTOMER_MANAGE);
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,7 +41,7 @@ const Customers = () => {
       const customerList = data?.data || data?.customers || data || [];
 
       if (Array.isArray(customerList)) {
-        setCustomers(customerList.filter(user => user.role !== 'admin'));
+        setCustomers(customerList.filter(item => !isAdminRole(item.role)));
       } else {
         setCustomers([]);
       }
@@ -207,26 +211,30 @@ const Customers = () => {
                         </button>
 
                         {/* Edit Button */}
-                        <button
-                          onClick={() => handleEditOpen(customer)}
-                          className="hover:text-blue-500 transition-colors"
-                          title="Edit Customer"
-                        >
-                          <FiEdit size={18} />
-                        </button>
+                        {canManage && (
+                          <button
+                            onClick={() => handleEditOpen(customer)}
+                            className="hover:text-blue-500 transition-colors"
+                            title="Edit Customer"
+                          >
+                            <FiEdit size={18} />
+                          </button>
+                        )}
 
                         {/* Ban / Unban Button */}
-                        <button
-                          onClick={() => handleBanToggle(customer)}
-                          className={`transition-colors ${isBanned ? 'text-green-500 hover:text-green-600' : 'text-red-400 hover:text-red-600'}`}
-                          title={isBanned ? 'Unban Customer' : 'Ban Customer'}
-                        >
-                          {isBanned ? (
-                            <FiUserCheck size={18} />
-                          ) : (
-                            <FiUserX size={18} />
-                          )}
-                        </button>
+                        {canManage && (
+                          <button
+                            onClick={() => handleBanToggle(customer)}
+                            className={`transition-colors ${isBanned ? 'text-green-500 hover:text-green-600' : 'text-red-400 hover:text-red-600'}`}
+                            title={isBanned ? 'Unban Customer' : 'Ban Customer'}
+                          >
+                            {isBanned ? (
+                              <FiUserCheck size={18} />
+                            ) : (
+                              <FiUserX size={18} />
+                            )}
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

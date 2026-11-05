@@ -1,48 +1,206 @@
-import React, { useEffect, useState } from 'react';
-import { FiEye, FiSearch, FiX } from 'react-icons/fi';
-import { getRecentOrders, updateAdminOrderStatus } from '../../api/catalog';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { FiEye, FiX, FiTruck, FiCreditCard, FiPackage } from 'react-icons/fi';
+import { FaFileExcel, FaFilePdf } from 'react-icons/fa';
+import Swal from 'sweetalert2';
+import {
+  getAdminOrders,
+  updateAdminOrderStatus,
+  bulkUpdateOrderStatus,
+  bulkUpdateOrderPaymentStatus,
+} from '../../api/catalog';
 import api from '../../api/client';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import DataTable, { buildQueryParams } from './DataTable';
+import { useAuth } from '../../contexts/AuthContext';
+import { can, PERMISSIONS } from '../../utils/permissions';
+
+const DATE_PRESETS = [
+  { value: '', label: 'All Time' },
+  { value: 'TODAY', label: 'Today' },
+  { value: 'WEEK', label: 'Last 7 Days' },
+  { value: 'MONTH', label: 'Last 30 Days' },
+];
+
+const ORDER_STATUSES = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+const PAYMENT_STATUSES = ['PENDING', 'PAID', 'FAILED'];
+
+const buildDateFilters = preset => {
+  if (!preset) return {};
+  const now = new Date();
+  const to = now.toISOString();
+
+  if (preset === 'TODAY') {
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    return { createdFrom: start.toISOString(), createdTo: to };
+  }
+  if (preset === 'WEEK') {
+    const start = new Date(now);
+    start.setDate(start.getDate() - 7);
+    return { createdFrom: start.toISOString(), createdTo: to };
+  }
+  if (preset === 'MONTH') {
+    const start = new Date(now);
+    start.setMonth(start.getMonth() - 1);
+    return { createdFrom: start.toISOString(), createdTo: to };
+  }
+  return {};
+};
+
+const normalizeStatus = value => (value || '').toUpperCase();
+
+const getStatusColor = status => {
+  switch (normalizeStatus(status)) {
+    case 'PENDING':
+      return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+    case 'PROCESSING':
+      return 'bg-blue-100 text-blue-700 border-blue-200';
+    case 'SHIPPED':
+      return 'bg-purple-100 text-purple-700 border-purple-200';
+    case 'DELIVERED':
+    case 'PAID':
+      return 'bg-green-100 text-green-700 border-green-200';
+    case 'CANCELLED':
+    case 'FAILED':
+    case 'UNPAID':
+      return 'bg-red-100 text-red-700 border-red-200';
+    default:
+      return 'bg-gray-100 text-gray-700 border-gray-200';
+  }
+};
 
 const AdminOrders = () => {
+  const { user } = useAuth();
+  const canUpdate = can(user, PERMISSIONS.ORDER_UPDATE);
   const [orders, setOrders] = useState([]);
+  const [meta, setMeta] = useState({ total: 0, page: 1, limit: 10, totalPages: 0 });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [query, setQuery] = useState(null);
+  const [datePreset, setDatePreset] = useState('');
+  const [reloadKey, setReloadKey] = useState(0);
 
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatingId, setUpdatingId] = useState(null);
 
+  const location = useLocation();
+  const handledOrderIdRef = useRef(null);
+
+  const extraFilters = useMemo(
+    () => buildDateFilters(datePreset),
+    [datePreset],
+  );
+
+  const reload = useCallback(() => setReloadKey(key => key + 1), []);
+
+  // ---- Server-side data fetching ----
   useEffect(() => {
+    if (!query) return;
+    let cancelled = false;
+
     const fetchOrders = async () => {
       try {
-        const data = await getRecentOrders(50);
-        setOrders(data);
-      } catch (error) {
-        console.error('Failed to load orders:', error);
+        setLoading(true);
+        setError(null);
+        const { orders: list, meta: responseMeta } = await getAdminOrders(
+          buildQueryParams(query),
+        );
+        if (cancelled) return;
+        setOrders(list);
+        setMeta(responseMeta);
+      } catch (err) {
+        if (cancelled) return;
+        console.error('Failed to load orders:', err);
+        setError('Failed to load orders. Please try again.');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
+
     fetchOrders();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [query, reloadKey]);
+
+  // ---- Notification deep-link: open the matching order's modal ----
+  useEffect(() => {
+    const orderIdFromUrl = new URLSearchParams(location.search).get('orderId');
+    if (!orderIdFromUrl || orders.length === 0) return;
+
+    const normalizeId = value =>
+      String(value ?? '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '');
+    const stripOrderPrefix = value =>
+      value.startsWith('ord') ? value.slice(3) : value;
+
+    const target = normalizeId(orderIdFromUrl);
+    if (!target) return;
+    if (handledOrderIdRef.current === target) return;
+
+    const targetNoPrefix = stripOrderPrefix(target);
+
+    const foundOrder = orders.find(order => {
+      const candidates = [order._id, order.orderNumber]
+        .map(normalizeId)
+        .filter(Boolean);
+
+      return candidates.some(candidate => {
+        if (candidate === target) return true;
+        const candidateNoPrefix = stripOrderPrefix(candidate);
+        if (candidateNoPrefix && candidateNoPrefix === targetNoPrefix) return true;
+        return (
+          targetNoPrefix.length >= 4 &&
+          candidateNoPrefix.length >= 4 &&
+          (candidateNoPrefix.includes(targetNoPrefix) ||
+            targetNoPrefix.includes(candidateNoPrefix))
+        );
+      });
+    });
+
+    if (foundOrder) {
+      handledOrderIdRef.current = target;
+      setSelectedOrder(foundOrder);
+      setIsModalOpen(true);
+      return;
+    }
+
+    // Not on the current page — fetch it directly by id / order number.
+    const fetchSingleOrder = async () => {
+      try {
+        const response = await api.get(`/orders/${orderIdFromUrl}`);
+        const order = response.data?.data || response.data;
+        if (order) {
+          handledOrderIdRef.current = target;
+          setSelectedOrder(order);
+          setIsModalOpen(true);
+        }
+      } catch (err) {
+        console.error('Failed to fetch specific order:', err);
+      }
+    };
+    fetchSingleOrder();
+  }, [location.search, orders]);
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       setUpdatingId(orderId);
       await updateAdminOrderStatus(orderId, newStatus);
-
-      setOrders(prevOrders =>
-        prevOrders.map(order =>
-          order._id === orderId ? { ...order, orderStatus: newStatus } : order,
+      setOrders(prev =>
+        prev.map(o =>
+          o._id === orderId ? { ...o, orderStatus: newStatus } : o,
         ),
       );
-
       if (selectedOrder && selectedOrder._id === orderId) {
         setSelectedOrder(prev => ({ ...prev, orderStatus: newStatus }));
       }
-
-      alert('Order status updated successfully!');
-    } catch (error) {
-      alert(error.response?.data?.message || 'Failed to update order status.');
+    } catch (err) {
+      console.error('Failed to update order status:', err);
+      Swal.fire('Error', 'Failed to update order status.', 'error');
     } finally {
       setUpdatingId(null);
     }
@@ -51,170 +209,366 @@ const AdminOrders = () => {
   const handlePaymentStatusChange = async (orderId, newPaymentStatus) => {
     try {
       setUpdatingId(orderId);
-
       await api.put(`/orders/${orderId}/payment-status`, {
         paymentStatus: newPaymentStatus,
       });
-
-      setOrders(prevOrders =>
-        prevOrders.map(order =>
-          order._id === orderId
-            ? { ...order, paymentStatus: newPaymentStatus }
-            : order,
+      setOrders(prev =>
+        prev.map(o =>
+          o._id === orderId ? { ...o, paymentStatus: newPaymentStatus } : o,
         ),
       );
-
       if (selectedOrder && selectedOrder._id === orderId) {
-        setSelectedOrder(prev => ({
-          ...prev,
-          paymentStatus: newPaymentStatus,
-        }));
+        setSelectedOrder(prev => ({ ...prev, paymentStatus: newPaymentStatus }));
       }
-
-      alert('Payment status updated successfully!');
-    } catch (error) {
-      alert(
-        error.response?.data?.message || 'Failed to update payment status.',
-      );
+    } catch (err) {
+      console.error('Failed to update payment status:', err);
+      Swal.fire('Error', 'Failed to update payment status.', 'error');
     } finally {
       setUpdatingId(null);
     }
   };
 
-  const getStatusColor = status => {
-    switch (status?.toUpperCase()) {
-      case 'PENDING':
-        return 'bg-yellow-100 text-yellow-700';
-      case 'PROCESSING':
-        return 'bg-blue-100 text-blue-700';
-      case 'SHIPPED':
-        return 'bg-purple-100 text-purple-700';
-      case 'DELIVERED':
-      case 'PAID':
-        return 'bg-green-100 text-green-700';
-      case 'CANCELLED':
-      case 'UNPAID':
-        return 'bg-red-100 text-red-700';
-      default:
-        return 'bg-gray-100 text-gray-700';
+  const runBulk = async (ids, runner, successText) => {
+    const result = await Swal.fire({
+      title: 'Apply bulk action?',
+      text: `${successText} for ${ids.length} order(s)?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#DB4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, apply',
+    });
+    if (!result.isConfirmed) return;
+
+    try {
+      const response = await runner(ids);
+      Swal.fire(
+        'Success',
+        response?.message || `${ids.length} order(s) updated.`,
+        'success',
+      );
+      reload();
+    } catch (err) {
+      console.error('Bulk action failed:', err);
+      Swal.fire('Error', 'Bulk action failed. Please try again.', 'error');
     }
   };
 
-  const handleViewDetails = order => {
-    setSelectedOrder(order);
-    setIsModalOpen(true);
+  const handleExportExcel = async () => {
+    try {
+      const response = await api.get('/orders/export/excel', {
+        responseType: 'blob',
+      });
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `Admin_Orders_${new Date().toLocaleDateString()}.xlsx`;
+      link.click();
+    } catch (err) {
+      Swal.fire('Error', 'Failed to download excel from server.', 'error');
+    }
   };
 
-  if (loading)
-    return (
-      <div className="text-center py-20 font-poppins">Loading orders...</div>
-    );
+  const handleExportPDF = () => {
+    if (orders.length === 0) {
+      Swal.fire('Empty', 'No data to export on this page.', 'info');
+      return;
+    }
+    const doc = new jsPDF('landscape');
+    doc.setFontSize(20);
+    doc.setTextColor(219, 68, 68);
+    doc.setFont('helvetica', 'bold');
+    doc.text('EXCLUSIVE - Order Report', 14, 20);
+    doc.setFontSize(10);
+    doc.setTextColor(80, 80, 80);
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 28);
+    doc.text(`Filters: ${datePreset || 'ALL'}`, 14, 34);
+    doc.text(`Records on page: ${orders.length}`, 14, 40);
+
+    autoTable(doc, {
+      startY: 45,
+      head: [
+        [
+          'SL',
+          'Order ID',
+          'Customer',
+          'Date',
+          'Items',
+          'Status',
+          'Payment',
+          'Total (Tk)',
+        ],
+      ],
+      body: orders.map((order, index) => [
+        index + 1,
+        order.orderNumber || order._id.slice(-6).toUpperCase(),
+        order.user?.name || 'Guest',
+        new Date(order.createdAt).toLocaleDateString(),
+        order.items?.length || 0,
+        normalizeStatus(order.orderStatus),
+        normalizeStatus(order.paymentStatus || 'PENDING'),
+        Number(order.total || 0).toFixed(2),
+      ]),
+      theme: 'grid',
+      headStyles: { fillColor: [219, 68, 68] },
+      styles: { fontSize: 9 },
+    });
+    doc.save(`Orders_Report_${datePreset || 'ALL'}_${Date.now()}.pdf`);
+  };
+
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: 'orderNumber',
+        header: 'Order ID',
+        cell: ({ row }) => (
+          <span className="font-semibold text-gray-800">
+            {row.original.orderNumber ||
+              row.original._id.slice(-6).toUpperCase()}
+          </span>
+        ),
+      },
+      {
+        id: 'customer',
+        header: 'Customer',
+        enableSorting: false,
+        cell: ({ row }) => (
+          <div>
+            <p className="font-medium text-gray-800">
+              {row.original.user?.name || 'Guest'}
+            </p>
+            <p className="text-xs text-gray-400">
+              {row.original.user?.email || ''}
+            </p>
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'createdAt',
+        header: 'Date',
+        cell: ({ getValue }) => (
+          <span className="text-gray-500">
+            {new Date(getValue()).toLocaleDateString()}
+          </span>
+        ),
+      },
+      {
+        id: 'items',
+        header: 'Items',
+        enableSorting: false,
+        cell: ({ row }) => (
+          <span className="inline-flex items-center gap-1.5 text-gray-600">
+            <FiPackage size={14} className="text-gray-400" />
+            {row.original.items?.length || 0}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'total',
+        header: 'Total',
+        cell: ({ getValue }) => (
+          <span className="font-semibold text-[#DB4444]">
+            ৳{Number(getValue() || 0).toFixed(2)}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'orderStatus',
+        header: 'Order Status',
+        meta: {
+          filterKey: 'orderStatus',
+          filterLabel: 'All Status',
+          filterOptions: ORDER_STATUSES.map(s => ({ value: s, label: s })),
+        },
+        cell: ({ row }) =>
+          canUpdate ? (
+            <select
+              value={normalizeStatus(row.original.orderStatus)}
+              onChange={e =>
+                handleStatusChange(row.original._id, e.target.value)
+              }
+              disabled={updatingId === row.original._id}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border outline-none cursor-pointer disabled:opacity-60 ${getStatusColor(
+                row.original.orderStatus,
+              )}`}
+            >
+              {ORDER_STATUSES.map(status => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <span
+              className={`inline-block px-2.5 py-1.5 rounded-lg text-xs font-semibold border ${getStatusColor(
+                row.original.orderStatus,
+              )}`}
+            >
+              {normalizeStatus(row.original.orderStatus)}
+            </span>
+          ),
+      },
+      {
+        accessorKey: 'paymentStatus',
+        header: 'Payment',
+        meta: {
+          filterKey: 'paymentStatus',
+          filterLabel: 'All Payment',
+          filterOptions: PAYMENT_STATUSES.map(s => ({ value: s, label: s })),
+        },
+        cell: ({ row }) =>
+          canUpdate ? (
+            <select
+              value={normalizeStatus(row.original.paymentStatus || 'PENDING')}
+              onChange={e =>
+                handlePaymentStatusChange(row.original._id, e.target.value)
+              }
+              disabled={updatingId === row.original._id}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border outline-none cursor-pointer disabled:opacity-60 ${getStatusColor(
+                row.original.paymentStatus,
+              )}`}
+            >
+              {PAYMENT_STATUSES.map(status => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <span
+              className={`inline-block px-2.5 py-1.5 rounded-lg text-xs font-semibold border ${getStatusColor(
+                row.original.paymentStatus || 'PENDING',
+              )}`}
+            >
+              {normalizeStatus(row.original.paymentStatus || 'PENDING')}
+            </span>
+          ),
+      },
+      {
+        id: 'actions',
+        header: 'View',
+        enableSorting: false,
+        cell: ({ row }) => (
+          <button
+            onClick={() => {
+              setSelectedOrder(row.original);
+              setIsModalOpen(true);
+            }}
+            className="p-2 bg-gray-100 text-gray-600 hover:bg-[#DB4444] hover:text-white rounded-lg transition-colors"
+            title="View Details"
+          >
+            <FiEye size={16} />
+          </button>
+        ),
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [updatingId, selectedOrder, canUpdate],
+  );
 
   return (
-    <div className="bg-white p-6 shadow-sm border border-gray-100 rounded-sm font-poppins relative">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div className="font-poppins">
+      <div className="mb-6">
         <h2 className="text-2xl font-bold font-inter text-black">
           Order Management
         </h2>
-        <div className="flex items-center bg-gray-50 border border-gray-200 px-4 py-2 rounded-md w-full md:w-64">
-          <FiSearch className="text-gray-400 mr-2" />
-          <input
-            type="text"
-            placeholder="Search orders..."
-            className="bg-transparent outline-none w-full text-sm"
-          />
-        </div>
+        <p className="text-sm text-gray-500 mt-1">
+          Track, filter and update orders with server-side power.
+        </p>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse whitespace-nowrap">
-          <thead>
-            <tr className="bg-[#F8F9FA] text-gray-600 border-b border-gray-200 text-sm">
-              <th className="p-4 font-medium">Order ID</th>
-              <th className="p-4 font-medium">Customer</th>
-              <th className="p-4 font-medium">Date</th>
-              <th className="p-4 font-medium">Total Amount</th>
-              <th className="p-4 font-medium">Order Status</th>
-              <th className="p-4 font-medium">Payment Status</th>
-              <th className="p-4 font-medium text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.length === 0 ? (
-              <tr>
-                <td colSpan="7" className="text-center py-8 text-gray-500">
-                  No orders found.
-                </td>
-              </tr>
-            ) : (
-              orders.map(order => (
-                <tr
-                  key={order._id}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors text-sm text-black"
-                >
-                  <td className="p-4 font-semibold">
-                    {order.orderNumber || order._id.slice(-6).toUpperCase()}
-                  </td>
-                  <td className="p-4">{order.user?.name || 'Guest'}</td>
-                  <td className="p-4 text-gray-500">
-                    {new Date(order.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="p-4 font-semibold text-[#DB4444]">
-                    ৳{order.total}
-                  </td>
-                  <td className="p-4">
-                    <select
-                      value={order.orderStatus}
-                      onChange={e =>
-                        handleStatusChange(order._id, e.target.value)
-                      }
-                      disabled={updatingId === order._id}
-                      className={`px-3 py-1.5 rounded-md text-xs font-medium outline-none cursor-pointer border border-gray-200 ${getStatusColor(
-                        order.orderStatus,
-                      )}`}
-                    >
-                      <option value="PENDING">PENDING</option>
-                      <option value="PROCESSING">PROCESSING</option>
-                      <option value="SHIPPED">SHIPPED</option>
-                      <option value="DELIVERED">DELIVERED</option>
-                      <option value="CANCELLED">CANCELLED</option>
-                    </select>
-                  </td>
-
-                  <td className="p-4">
-                    <select
-                      value={order.paymentStatus || 'PENDING'}
-                      onChange={e =>
-                        handlePaymentStatusChange(order._id, e.target.value)
-                      }
-                      disabled={updatingId === order._id}
-                      className={`px-3 py-1.5 rounded-md text-xs font-medium outline-none cursor-pointer border border-gray-200 ${getStatusColor(
-                        order.paymentStatus,
-                      )}`}
-                    >
-                      <option value="PENDING">PENDING</option>
-                      <option value="PAID">PAID</option>
-                      <option value="FAILED">FAILED</option>
-                    </select>
-                  </td>
-
-                  <td className="p-4 text-center">
-                    <div className="flex justify-center items-center gap-2">
+      <DataTable
+        columns={columns}
+        data={orders}
+        loading={loading}
+        error={error}
+        meta={meta}
+        enableSelection={canUpdate}
+        extraFilters={extraFilters}
+        onQueryChange={setQuery}
+        onRetry={reload}
+        getRowId={row => row._id}
+        searchPlaceholder="Search by order ID, customer name or email..."
+        emptyTitle="No orders found"
+        emptyDescription="Try changing the search term or filters."
+        toolbar={
+          <>
+            <select
+              value={datePreset}
+              onChange={e => setDatePreset(e.target.value)}
+              className="bg-gray-50 border border-gray-200 px-3.5 py-2.5 rounded-xl text-sm outline-none cursor-pointer text-gray-600"
+            >
+              {DATE_PRESETS.map(preset => (
+                <option key={preset.value} value={preset.value}>
+                  {preset.label}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleExportExcel}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+            >
+              <FaFileExcel /> Excel
+            </button>
+            <button
+              onClick={handleExportPDF}
+              className="flex items-center gap-2 bg-[#DB4444] hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+            >
+              <FaFilePdf /> PDF
+            </button>
+          </>
+        }
+        bulkActions={
+          canUpdate
+            ? ({ selectedIds, clearSelection }) => (
+                <>
+                  <div className="flex items-center gap-1.5">
+                    <FiTruck size={14} className="text-gray-500" />
+                    {['PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'].map(
+                      status => (
+                        <button
+                          key={status}
+                          type="button"
+                          onClick={() =>
+                            runBulk(
+                              selectedIds,
+                              ids => bulkUpdateOrderStatus(ids, status),
+                              `Set order status to ${status}`,
+                            ).then(clearSelection)
+                          }
+                          className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold rounded-lg transition-colors"
+                        >
+                          {status}
+                        </button>
+                      ),
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5 sm:border-l sm:border-red-200 sm:pl-3">
+                    <FiCreditCard size={14} className="text-gray-500" />
+                    {['PAID', 'PENDING', 'FAILED'].map(status => (
                       <button
-                        onClick={() => handleViewDetails(order)}
-                        className="p-2 bg-gray-100 text-gray-600 hover:bg-[#DB4444] hover:text-white rounded transition-colors"
-                        title="View Details"
+                        key={status}
+                        type="button"
+                        onClick={() =>
+                          runBulk(
+                            selectedIds,
+                            ids => bulkUpdateOrderPaymentStatus(ids, status),
+                            `Set payment status to ${status}`,
+                          ).then(clearSelection)
+                        }
+                        className="px-2.5 py-1.5 bg-gray-700 hover:bg-gray-800 text-white text-[11px] font-semibold rounded-lg transition-colors"
                       >
-                        <FiEye size={16} />
+                        {status}
                       </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+                    ))}
+                  </div>
+                </>
+              )
+            : undefined
+        }
+      />
 
       {isModalOpen && selectedOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
@@ -230,7 +584,6 @@ const AdminOrders = () => {
                 <FiX size={20} />
               </button>
             </div>
-
             <div className="p-6 overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div>
@@ -259,47 +612,13 @@ const AdminOrders = () => {
                 </div>
                 <div>
                   <h4 className="text-sm text-gray-500 font-medium mb-1">
-                    Order Status Update
+                    Order Status
                   </h4>
-                  <select
-                    value={selectedOrder.orderStatus}
-                    onChange={e =>
-                      handleStatusChange(selectedOrder._id, e.target.value)
-                    }
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium outline-none cursor-pointer border border-gray-200 mt-1 ${getStatusColor(
-                      selectedOrder.orderStatus,
-                    )}`}
-                  >
-                    <option value="PENDING">PENDING</option>
-                    <option value="PROCESSING">PROCESSING</option>
-                    <option value="SHIPPED">SHIPPED</option>
-                    <option value="DELIVERED">DELIVERED</option>
-                    <option value="CANCELLED">CANCELLED</option>
-                  </select>
-                </div>
-                <div>
-                  <h4 className="text-sm text-gray-500 font-medium mb-1">
-                    Payment Status Update
-                  </h4>
-                  <select
-                    value={selectedOrder.paymentStatus || 'PENDING'}
-                    onChange={e =>
-                      handlePaymentStatusChange(
-                        selectedOrder._id,
-                        e.target.value,
-                      )
-                    }
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium outline-none cursor-pointer border border-gray-200 mt-1 ${getStatusColor(
-                      selectedOrder.paymentStatus,
-                    )}`}
-                  >
-                    <option value="PENDING">PENDING</option>
-                    <option value="PAID">PAID</option>
-                    <option value="FAILED">FAILED</option>
-                  </select>
+                  <p className="font-semibold text-black">
+                    {normalizeStatus(selectedOrder.orderStatus)}
+                  </p>
                 </div>
               </div>
-
               <div className="mb-8 p-4 bg-gray-50 rounded-sm border border-gray-100">
                 <h4 className="font-bold text-black mb-2">
                   Shipping Information
@@ -313,13 +632,9 @@ const AdminOrders = () => {
                 <p className="text-sm text-gray-700">
                   <strong>Address:</strong>{' '}
                   {selectedOrder.shippingAddress?.street},{' '}
-                  {selectedOrder.shippingAddress?.city},{' '}
-                  {selectedOrder.shippingAddress?.state}{' '}
-                  {selectedOrder.shippingAddress?.zipCode},{' '}
-                  {selectedOrder.shippingAddress?.country}
+                  {selectedOrder.shippingAddress?.city}
                 </p>
               </div>
-
               <div>
                 <h4 className="font-bold text-black mb-4 border-b pb-2">
                   Products Purchased
@@ -342,21 +657,11 @@ const AdminOrders = () => {
                         />
                         <div>
                           <p className="font-medium text-black line-clamp-1">
-                            {item.product?.name ||
-                              item.product?.title ||
-                              'Product Name'}
+                            {item.product?.name || item.product?.title}
                           </p>
                           <p className="text-sm text-gray-500">
                             Qty: {item.quantity}
                           </p>
-                          {item.variant && (
-                            <p className="text-xs text-gray-400 mt-1">
-                              Variant:{' '}
-                              {typeof item.variant === 'object'
-                                ? Object.values(item.variant).join(', ')
-                                : item.variant}
-                            </p>
-                          )}
                         </div>
                       </div>
                       <p className="font-semibold text-black">
@@ -367,7 +672,6 @@ const AdminOrders = () => {
                 </div>
               </div>
             </div>
-
             <div className="p-5 border-t bg-gray-50 flex flex-col items-end">
               <div className="w-full md:w-1/2 space-y-2">
                 <div className="flex justify-between text-sm text-gray-600">
@@ -378,12 +682,6 @@ const AdminOrders = () => {
                   <span>Shipping:</span>
                   <span>৳{selectedOrder.shippingCost || 0}</span>
                 </div>
-                {selectedOrder.discount > 0 && (
-                  <div className="flex justify-between text-sm text-[#DB4444]">
-                    <span>Discount:</span>
-                    <span>-৳{selectedOrder.discount}</span>
-                  </div>
-                )}
                 <div className="flex justify-between text-lg font-bold text-black border-t pt-2 mt-2">
                   <span>Total:</span>
                   <span>৳{selectedOrder.total}</span>

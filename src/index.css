@@ -96,3 +96,31 @@ background: linear-gradient(90deg,rgba(5, 5, 5, 1) 53%, rgba(60, 60, 64, 0.96) 7
 
 
 }
+
+/* TESTIMONIAL SLIDER DOTS */
+.testimonial-pagination .custom-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #bfbfbf;
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.testimonial-pagination .swiper-pagination-bullet-active {
+  background: #db4444 !important;
+  box-shadow: 0 0 0 2px rgba(219, 68, 68, 0.25);
+}
+
+/* GLOBAL LOADING PROGRESS BAR (nprogress) */
+#nprogress .bar {
+  background: #db4444 !important;
+  height: 3px !important;
+  z-index: 9999 !important;
+}
+
+#nprogress .peg {
+  box-shadow:
+    0 0 10px #db4444,
+    0 0 5px #db4444 !important;
+}

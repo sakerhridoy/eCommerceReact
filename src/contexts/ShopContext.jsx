@@ -9,21 +9,75 @@ const ShopContext = createContext();
 export const ShopProvider = ({ children }) => {
   const { user } = useAuth();
   const cart = useShopStore(state => state.cart);
-  const cartSubtotal = useShopStore(state => state.cartSubtotal);
+  const cartSubtotal = useShopStore(state => state.cartSubtotal); // Original Subtotal (for all items)
   const wishlist = useShopStore(state => state.wishlist);
   const [cartError, setCartError] = useState('');
   const previousUserId = useRef(null);
   const setCart = useShopStore(state => state.replaceCart);
   const addGuestItem = useShopStore(state => state.addToCart);
   const addToWishlist = useShopStore(state => state.addToWishlist);
-  const incrementGuestQuantity = useShopStore(
-    state => state.incrementQuantity,
-  );
-  const decrementGuestQuantity = useShopStore(
-    state => state.decrementQuantity,
-  );
+  const incrementGuestQuantity = useShopStore(state => state.incrementQuantity);
+  const decrementGuestQuantity = useShopStore(state => state.decrementQuantity);
   const removeGuestItem = useShopStore(state => state.removeFromCart);
   const removeFromWishlist = useShopStore(state => state.removeFromWishlist);
+
+  // Global Coupon States (Synced with LocalStorage for persistence)
+  const [appliedCoupon, setAppliedCoupon] = useState(
+    () => localStorage.getItem('appliedCoupon') || null,
+  );
+  const [discountAmount, setDiscountAmount] = useState(
+    () => Number(localStorage.getItem('couponDiscount')) || 0,
+  );
+
+  // ==========================================
+  // PHASE 2: ADVANCED CART SELECTION STATE
+  // ==========================================
+  const [selectedItems, setSelectedItems] = useState([]);
+  const prevCartRef = useRef([]);
+
+  const getItemId = item => item.id || item.cartItemId || item._id;
+  const getItemPrice = item =>
+    item.discountPrice ?? item.dPrice ?? item.price ?? 0;
+
+  // Sync selection state with cart changes
+  useEffect(() => {
+    const prevCart = prevCartRef.current;
+    const currentCartIds = cart.map(getItemId);
+
+    // Identify newly added items to auto-select them
+    const newItems = cart.filter(
+      item => !prevCart.some(p => getItemId(p) === getItemId(item)),
+    );
+
+    if (newItems.length > 0 || cart.length !== prevCart.length) {
+      setSelectedItems(prev => {
+        // Remove IDs that are no longer in the cart
+        const validSelections = prev.filter(id => currentCartIds.includes(id));
+        // Add new item IDs to the selection
+        const newIds = newItems.map(getItemId);
+        return [...new Set([...validSelections, ...newIds])]; // Use Set to prevent duplicates
+      });
+    }
+    prevCartRef.current = cart;
+  }, [cart]);
+
+  const toggleSelection = id => {
+    setSelectedItems(prev =>
+      prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id],
+    );
+  };
+
+  const selectAll = () => setSelectedItems(cart.map(getItemId));
+  const deselectAll = () => setSelectedItems([]);
+
+  // Calculate subtotal ONLY for selected items
+  const selectedSubtotal = cart
+    .filter(item => selectedItems.includes(getItemId(item)))
+    .reduce(
+      (total, item) => total + getItemPrice(item) * (item.quantity || 1),
+      0,
+    );
+  // ==========================================
 
   const applyServerCart = serverCart => {
     const items = (serverCart.items || [])
@@ -95,6 +149,21 @@ export const ShopProvider = ({ children }) => {
       active = false;
     };
   }, [user?._id]);
+
+  // Global Coupon Handlers
+  const saveCoupon = (code, discount) => {
+    setAppliedCoupon(code);
+    setDiscountAmount(discount);
+    localStorage.setItem('appliedCoupon', code);
+    localStorage.setItem('couponDiscount', discount);
+  };
+
+  const removeGlobalCoupon = () => {
+    setAppliedCoupon(null);
+    setDiscountAmount(0);
+    localStorage.removeItem('appliedCoupon');
+    localStorage.removeItem('couponDiscount');
+  };
 
   const addToCart = async product => {
     if (!user) {
@@ -177,6 +246,7 @@ export const ShopProvider = ({ children }) => {
   };
 
   const clearCart = async () => {
+    removeGlobalCoupon();
     if (!user) {
       setCart([]);
       return;
@@ -191,14 +261,27 @@ export const ShopProvider = ({ children }) => {
     }
   };
 
-  const clearLocalCart = () => setCart([]);
+  const clearLocalCart = () => {
+    setCart([]);
+    removeGlobalCoupon();
+  };
 
   return (
     <ShopContext.Provider
       value={{
         cart,
-        cartSubtotal,
+        cartSubtotal, // All items total
         wishlist,
+        appliedCoupon,
+        discountAmount,
+
+        // Advanced Cart Variables
+        selectedItems,
+        selectedSubtotal,
+
+        // Functions
+        saveCoupon,
+        removeGlobalCoupon,
         addToCart,
         addToWishlist,
         incrementQuantity,
@@ -207,6 +290,9 @@ export const ShopProvider = ({ children }) => {
         removeFromWishlist,
         clearCart,
         clearLocalCart,
+        toggleSelection,
+        selectAll,
+        deselectAll,
       }}
     >
       {cartError && (

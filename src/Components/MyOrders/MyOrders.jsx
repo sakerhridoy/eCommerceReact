@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiEye, FiPackage, FiTruck, FiX, FiCheck } from 'react-icons/fi';
+import {
+  FiEye,
+  FiPackage,
+  FiTruck,
+  FiX,
+  FiCheck,
+  FiDownload,
+} from 'react-icons/fi';
 import { getMyOrders, cancelMyOrder } from '../../api/catalog';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -15,6 +24,9 @@ const MyOrders = () => {
   // Track Order Modal State
   const [trackingOrder, setTrackingOrder] = useState(null);
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
+
+  // Download PDF State
+  const [downloadingOrderId, setDownloadingOrderId] = useState(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -93,6 +105,169 @@ const MyOrders = () => {
     return 'pending';
   };
 
+  // Generate Professional PDF Receipt from My Orders Page
+  const handleDownloadReceipt = order => {
+    setDownloadingOrderId(order._id);
+
+    try {
+      const doc = new jsPDF();
+
+      // Header - Store Name
+      doc.setFontSize(24);
+      doc.setTextColor(219, 68, 68); // Exclusive Red Color #DB4444
+      doc.setFont('helvetica', 'bold');
+      doc.text('EXCLUSIVE', 14, 22);
+
+      // Invoice Title
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'normal');
+      doc.text('ORDER RECEIPT', 14, 32);
+
+      // Order Info (Left Side)
+      doc.setFontSize(10);
+      doc.setTextColor(80, 80, 80);
+      doc.text(
+        `Order No: ${order.orderNumber || order._id.slice(-6).toUpperCase()}`,
+        14,
+        42,
+      );
+      doc.text(
+        `Date: ${new Date(order.createdAt).toLocaleDateString()}`,
+        14,
+        48,
+      );
+      doc.text(
+        `Payment Method: ${order.paymentMethod?.toUpperCase() || 'COD'}`,
+        14,
+        54,
+      );
+      doc.text(
+        `Payment Status: ${order.paymentStatus?.toUpperCase() || 'PENDING'}`,
+        14,
+        60,
+      );
+
+      // Customer Info (Right Side)
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Billed To:', 120, 32);
+
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
+      doc.text(
+        `Name: ${order.user?.name || order.user?.firstName || 'Customer'}`,
+        120,
+        42,
+      );
+      doc.text(`Email: ${order.user?.email || 'N/A'}`, 120, 48);
+      doc.text(`Phone: ${order.shippingAddress?.phone || 'N/A'}`, 120, 54);
+
+      // Formatting Address
+      const addressText = order.shippingAddress
+        ? `${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.zipCode}`
+        : 'Address Not Available';
+      const splitAddress = doc.splitTextToSize(`Address: ${addressText}`, 80);
+      doc.text(splitAddress, 120, 60);
+
+      // Table Data Preparation
+      const tableColumn = [
+        'SL',
+        'Product Name',
+        'Variant',
+        'Price',
+        'Qty',
+        'Total',
+      ];
+      const tableRows = [];
+
+      order.items?.forEach((item, index) => {
+        const productName =
+          item.product?.title || item.product?.name || 'Product';
+        const variant =
+          item.variant && typeof item.variant === 'object'
+            ? Object.values(item.variant).join(', ')
+            : '-';
+        const price = `Tk ${(item.price || 0).toFixed(2)}`;
+        const qty = item.quantity;
+        const total = `Tk ${((item.price || 0) * item.quantity).toFixed(2)}`;
+
+        tableRows.push([index + 1, productName, variant, price, qty, total]);
+      });
+
+      // Generate Table
+      autoTable(doc, {
+        startY: 75,
+        head: [tableColumn],
+        body: tableRows,
+        theme: 'striped',
+        headStyles: { fillColor: [219, 68, 68], textColor: [255, 255, 255] },
+        styles: { fontSize: 9, cellPadding: 4 },
+        columnStyles: {
+          0: { cellWidth: 15 },
+          4: { halign: 'center' },
+          5: { halign: 'right' },
+        },
+      });
+
+      const finalY = doc.lastAutoTable.finalY || 75;
+      const subtotalAmount = order.subtotal || order.total;
+      const discountAmount = order.discount || 0;
+
+      // Pricing Summary
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`Subtotal:`, 140, finalY + 12);
+      doc.text(`Tk ${subtotalAmount.toFixed(2)}`, 195, finalY + 12, {
+        align: 'right',
+      });
+
+      let currentY = finalY + 12;
+
+      if (discountAmount > 0) {
+        currentY += 6;
+        doc.setTextColor(0, 128, 0);
+        doc.text(`Discount:`, 140, currentY);
+        doc.text(`- Tk ${discountAmount.toFixed(2)}`, 195, currentY, {
+          align: 'right',
+        });
+      }
+
+      currentY += 6;
+      doc.setTextColor(0, 0, 0);
+      doc.text(`Shipping:`, 140, currentY);
+      doc.text(`Tk 0.00`, 195, currentY, { align: 'right' });
+
+      // Grand Total
+      currentY += 8;
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(219, 68, 68);
+      doc.text(`Grand Total:`, 140, currentY);
+      doc.text(`Tk ${order.total.toFixed(2)}`, 195, currentY, {
+        align: 'right',
+      });
+
+      // Footer
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'italic');
+      doc.setTextColor(150, 150, 150);
+      doc.text('Thank you for shopping with Exclusive!', 105, 280, {
+        align: 'center',
+      });
+
+      // Save PDF
+      doc.save(`Invoice_${order.orderNumber || order._id}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Could not generate receipt. Please try again.');
+    } finally {
+      setDownloadingOrderId(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="text-center py-20 font-poppins text-lg">
@@ -167,7 +342,7 @@ const MyOrders = () => {
                     </td>
                     <td className="p-4">{order.items?.length || 0} item(s)</td>
                     <td className="p-4 font-semibold text-[#DB4444]">
-                      ৳{order.total}
+                      ৳{order.total?.toFixed(2) || '0.00'}
                     </td>
                     <td className="p-4">
                       <span
@@ -180,6 +355,20 @@ const MyOrders = () => {
                     {/* Action Column */}
                     <td className="p-4 text-center">
                       <div className="flex justify-center items-center gap-2">
+                        {/* Download Receipt Button */}
+                        <button
+                          onClick={() => handleDownloadReceipt(order)}
+                          disabled={downloadingOrderId === order._id}
+                          className={`p-2 rounded transition-colors ${
+                            downloadingOrderId === order._id
+                              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                              : 'bg-green-50 text-green-600 hover:bg-green-600 hover:text-white'
+                          }`}
+                          title="Download Receipt"
+                        >
+                          <FiDownload size={16} />
+                        </button>
+
                         {/* View Details Button */}
                         <button
                           onClick={() => handleViewDetails(order)}
@@ -340,7 +529,7 @@ const MyOrders = () => {
               <div className="w-full md:w-1/2 space-y-2">
                 <div className="flex justify-between text-lg font-bold text-black border-t pt-2">
                   <span>Total:</span>
-                  <span>৳{selectedOrder.total.toFixed(2)}</span>
+                  <span>৳{(selectedOrder.total || 0).toFixed(2)}</span>
                 </div>
               </div>
             </div>

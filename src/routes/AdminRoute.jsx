@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { isAdminRole } from '../utils/permissions';
 
 const AdminRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -11,7 +12,7 @@ const AdminRoute = ({ children }) => {
       </div>
     );
   }
-  if (!user || user.role !== 'admin') {
+  if (!user || !isAdminRole(user.role)) {
     return <Navigate to="/" replace />;
   }
   return children;

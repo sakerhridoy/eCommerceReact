@@ -9,6 +9,7 @@ import {
   getCategoryBySlug,
   getProducts,
 } from '../../api/catalog';
+import SEO from '../SEO';
 
 const Shop = () => {
   const { addToCart, wishlist, addToWishlist, removeFromWishlist, cart } =
@@ -84,6 +85,10 @@ const Shop = () => {
 
   return (
     <section className="pt-10 md:pt-20 pb-10 md:pb-24 font-poppins">
+      <SEO
+        title="Shop All Products"
+        description="Browse the full Exclusive catalogue — electronics, fashion, and home essentials at the best prices with fast delivery."
+      />
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
           <div className="lg:col-span-1">

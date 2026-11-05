@@ -8,17 +8,18 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Slider from 'react-slick';
 import { Link } from 'react-router-dom';
-import { getCategories } from '../../api/catalog';
+import { getCategories, getBanners } from '../../api/catalog';
 
 const Banner = () => {
-  /* ================= BANNER DATA ================= */
-  const bannerItems = [
+  /* ================= BANNER DATA (fallback) ================= */
+  const defaultBanners = [
     {
       id: 1,
       logo: apple,
       series: 'iPhone 14 Series',
       voucher: 'Up to 10% off Voucher',
       btn: 'Shop Now',
+      link: '/shop',
       img: banner,
     },
     {
@@ -27,6 +28,7 @@ const Banner = () => {
       series: 'iPhone 15 Series',
       voucher: 'Up to 15% off Voucher',
       btn: 'Shop Now',
+      link: '/shop',
       img: iphone15,
     },
     {
@@ -35,14 +37,42 @@ const Banner = () => {
       series: 'iPhone 16 Series',
       voucher: 'Up to 20% off Voucher',
       btn: 'Shop Now',
+      link: '/shop',
       img: iphone16,
-    }
+    },
   ];
 
   /* ================= STATE ================= */
+  const [bannerItems, setBannerItems] = useState(defaultBanners);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  /* ================= FETCH HERO BANNERS ================= */
+  useEffect(() => {
+    const fetchHeroBanners = async () => {
+      try {
+        const items = await getBanners({ type: 'hero' });
+        if (Array.isArray(items) && items.length) {
+          setBannerItems(
+            items.map(item => ({
+              id: item.id,
+              logo: apple,
+              series: item.label || '',
+              voucher: item.title || '',
+              btn: item.buttonText || 'Shop Now',
+              link: item.link || '/shop',
+              img: item.image || banner,
+            })),
+          );
+        }
+      } catch (err) {
+        // Fallback data already set
+      }
+    };
+
+    fetchHeroBanners();
+  }, []);
 
   /* ================= FETCH CATEGORIES ================= */
   useEffect(() => {
@@ -110,7 +140,7 @@ const Banner = () => {
               {bannerItems.map(item => (
                 <div key={item.id}>
                   {/* FIXED HEIGHT SLIDE */}
-                  <div className="bg-black h-105 lg:h-105 flex flex-col lg:flex-row gap-9.5 justify-center items-center lg:ps-16 pt-6 lg:pt-4 rounded-lg overflow-hidden">
+                  <div className="bg-black flex min-h-105 flex-col lg:h-105 lg:flex-row gap-6 lg:gap-9.5 justify-center items-center px-6 pt-8 pb-8 lg:px-0 lg:ps-16 lg:pt-4 lg:pb-0 rounded-lg overflow-hidden">
                     {/* LEFT CONTENT */}
                     <div className="w-full lg:w-[40%] text-center lg:text-left">
                       <div className="flex gap-6 items-center justify-center lg:justify-start mb-4">
@@ -120,12 +150,12 @@ const Banner = () => {
                         </p>
                       </div>
 
-                      <h2 className="font-inter font-semibold text-[32px] lg:text-[38px] xl:text-[48px] leading-10 lg:leading-15 pb-5.5 text-[#fafafa] tracking-[0.04em] lg:pe-12">
+                      <h2 className="font-inter font-semibold text-[26px] sm:text-[32px] lg:text-[38px] xl:text-[48px] leading-8 sm:leading-10 lg:leading-15 pb-5.5 text-[#fafafa] tracking-[0.04em] lg:pe-12">
                         {item.voucher}
                       </h2>
 
                       <Link
-                        to="/shop"
+                        to={item.link || '/shop'}
                         className="flex gap-2 items-center justify-center lg:justify-start group"
                       >
                         <span className="font-poppins text-base text-[#fafafa] border-b border-[#fafafa] pb-1 group-hover:text-[#DB4444] group-hover:border-[#DB4444] transition">
@@ -140,7 +170,7 @@ const Banner = () => {
                       <img
                         src={item.img}
                         alt="banner"
-                        className="w-65 sm:w-[320px] lg:w-99 h-auto lg:h-88 object-contain"
+                        className="w-52 sm:w-72 md:w-80 lg:w-99 h-auto max-h-60 sm:max-h-80 lg:max-h-none lg:h-88 object-contain"
                       />
                     </div>
                   </div>
