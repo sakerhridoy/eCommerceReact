@@ -13,7 +13,12 @@ import useShopStore from '../../store/cartStore';
 import { useAuth } from '../../contexts/AuthContext';
 import { getProducts, getImageUrl } from '../../api/catalog';
 import { useTranslation } from 'react-i18next';
-import { isAdminRole } from '../../utils/permissions';
+import {
+  isAdminRole,
+  normalizeRole,
+  ROLE_LABELS,
+  ROLES,
+} from '../../utils/permissions';
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
@@ -24,6 +29,14 @@ const Navbar = () => {
   const wishlistCount = useShopStore(state => state.wishlistCount);
   const { user, logout } = useAuth();
   const isAdmin = isAdminRole(user?.role);
+
+  // Staff-only role badge + role-aware "Profile" / "Dashboard" labels.
+  // The canonical `super_admin` role is surfaced to users as plain "Admin".
+  const normalizedRole = normalizeRole(user?.role);
+  const roleLabel =
+    normalizedRole === ROLES.SUPER_ADMIN
+      ? 'Admin'
+      : ROLE_LABELS[normalizedRole] || 'Admin';
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAcc, setShowAcc] = useState(false);
@@ -320,6 +333,11 @@ const Navbar = () => {
                               <p className="font-semibold text-white truncate">
                                 {user?.name || 'User'}
                               </p>
+                              {isAdmin && (
+                                <span className="mt-0.5 inline-block rounded-full bg-white/20 px-2 py-px text-[10px] font-semibold tracking-wide text-white uppercase">
+                                  {roleLabel}
+                                </span>
+                              )}
                               <p className="text-xs text-white/70 truncate">
                                 {user?.email}
                               </p>
@@ -333,7 +351,7 @@ const Navbar = () => {
                             >
                               <LuUser className="text-lg" />
                               {isAdmin
-                                ? t('Admin Profile')
+                                ? `${roleLabel} Profile`
                                 : t('Manage My Account')}
                             </Link>
                           </li>
@@ -345,7 +363,7 @@ const Navbar = () => {
                                 className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-colors hover:bg-white/10 hover:text-white"
                               >
                                 <LuUser className="text-lg" />{' '}
-                                {t('Admin Dashboard')}
+                                {`${roleLabel} Dashboard`}
                               </Link>
                             </li>
                           )}
@@ -492,6 +510,11 @@ const Navbar = () => {
                       <p className="font-medium text-black truncate">
                         {user?.name || 'User'}
                       </p>
+                      {isAdmin && (
+                        <span className="mt-0.5 inline-block rounded-full bg-[#DB4444]/10 px-2 py-px text-[10px] font-semibold tracking-wide text-[#DB4444] uppercase">
+                          {roleLabel}
+                        </span>
+                      )}
                       <p className="text-xs text-gray-500 truncate">
                         {user?.email}
                       </p>
@@ -502,13 +525,13 @@ const Navbar = () => {
                       to={isAdmin ? '/admin/profile' : '/myAccount'}
                       onClick={closeMenu}
                     >
-                      {isAdmin ? t('Admin Profile') : t('manageMyAccount')}
+                      {isAdmin ? `${roleLabel} Profile` : t('myAccount')}
                     </Link>
                   </li>
                   {isAdmin && (
                     <li>
                       <Link to="/admin" onClick={closeMenu}>
-                        {t('adminDashboard')}
+                        {`${roleLabel} Dashboard`}
                       </Link>
                     </li>
                   )}
